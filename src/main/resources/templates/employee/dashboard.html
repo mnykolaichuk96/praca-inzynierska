@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Workshop</title>
+</head>
+
+<body>
+<h2>Home Page</h2>
+<hr>
+
+
+<h4>Welcome<h2 th:text="${loggedEmployeeDetail.firstName}"/></h4>
+
+<hr>
+
+<hr>
+
+<div>
+    <a th:href="@{/employee/showAddCarForm}" class="btn btn-primary" role="button" aria-pressed="true">Add car</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
+
+<!--мапінг на show employee data-->
+<div>
+    <a th:href="@{/employee/showData}" class="btn btn-primary" role="button" aria-pressed="true">Show data</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
+
+<!--мапінг на update-->
+<div>
+    <a th:href="@{/employee/showUpdateForm}" class="btn btn-primary" role="button" aria-pressed="true">Show update</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
+<div>
+    <a th:href="@{/employee/showCars}" class="btn btn-primary" role="button" aria-pressed="true">Show car</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
+<div>
+    <a th:href="@{/employee/processDelete}" class="btn btn-primary" role="button" aria-pressed="true">Delete</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
+
+<br><br><br>
+
+<hr>
+
+<!-- Add a logout button    GOOD METHOD FOR LOGOUT BY USING METHOD=POST -->
+<form name="logoutForm" th:action="@{/logout}" method="POST" th:hidden="true">
+    <input hidden type="submit" value="Logout" />
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

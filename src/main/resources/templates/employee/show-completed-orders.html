@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Workshop</title>
+</head>
+
+<body>
+<h2>Home Page</h2>
+<hr>
+
+
+<h4>Welcome</h4>
+
+<hr>
+
+<hr>
+
+
+<div>
+<tr th:each="orderEmployeeDataIterator : ${orderEmployeeDataList}">
+
+
+        <td th:text="${orderEmployeeDataIterator.description}"/>
+        <td th:text="${orderEmployeeDataIterator.creationDate}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.marque}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.model}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.year}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.engineType}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.registrationNumber}"/>
+        <td th:text="${orderEmployeeDataIterator.carData.vin}"/>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.workshopName}"/>
+
+
+
+        <br><br>
+
+</tr>
+</div>
+<br><br><br>
+
+<hr>
+
+<!-- Add a logout button -->
+<form th:action="@{/logout}"
+      method="POST">
+
+    <input type="submit" value="Logout" />
+
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

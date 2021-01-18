@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Workshop</title>
+</head>
+
+<body>
+<h2>Home Page</h2>
+<hr>
+
+
+<h4>Welcome</h4>
+
+<hr>
+
+<hr>
+
+
+<div>
+    <tr th:each="car: ${cars}">
+        <td th:text="${car.model}" />
+        <td th:text="${car.marque}" />
+        <td th:text="${car.registrationNumber}" />
+    </tr>
+</div>
+
+<br><br><br>
+
+<hr>
+
+<!-- Add a logout button -->
+<form th:action="@{/logout}"
+      method="POST">
+
+    <input type="submit" value="Logout" />
+
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<title>Register New User Form</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Reference Bootstrap files -->
+	<link rel="stylesheet"
+		 href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+	<script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+		<style>
+		.error {color:red}
+	</style>
+
+</head>
+
+<body>
+
+	<div>
+
+		<div id="loginbox" style="margin-top: 50px;"
+			class="mainbox col-md-3 col-md-offset-2 col-sm-6 col-sm-offset-2">
+
+			<div class="panel panel-primary">
+
+				<div class="panel-heading">
+					<div class="panel-title">Update Employee</div>
+				</div>
+
+				<div style="padding-top: 30px" class="panel-body">
+
+					<!-- Registration Form -->
+					<form th:action="@{/workshop/processUpdateForm}"
+						  	   th:object="${workshopData}" method="POST"
+						  	   class="form-horizontal">
+
+					    <!-- Place for messages: error, alert etc ... -->
+					    <div class="form-group">
+					        <div class="col-xs-15">
+					            <div>
+
+									<!-- Check for registration error -->
+									<div th:if="${updateError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+										<span th:text="${updateError}"></span>
+									</div>
+
+					            </div>
+					        </div>
+					    </div>
+
+						<!-- Old User name -->
+						<input type="hidden" th:object="${wrapperString}" th:field="*{oldUsername}">
+
+						<!-- User name -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input type="text" th:field="*{username}" placeholder="username (*)" class="form-control" />
+						</div>
+
+						<div th:if="${#fields.hasErrors('username')}"
+							style="margin-bottom: 25px" class="text-danger">
+							<ul>
+							  <li th:each="err : ${#fields.errors('username')}" th:text="'User name ' + ${err}" />
+							</ul>
+						</div>
+
+						<!-- Password -->
+						<input type="hidden" th:field="*{password}">
+
+						<!-- Confirm Password -->
+						<input type="hidden" th:field="*{matchingPassword}">
+
+						<!-- Workshop name -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input type="text" th:field="*{workshopName}" placeholder="first name (*)" class="form-control" th:errorclass="fieldError" />
+						</div>
+						<div th:if="${#fields.hasErrors('workshopName')}"
+							style="margin-bottom: 25px" class="text-danger">
+							<ul>
+							  <li th:each="err : ${#fields.errors('workshopName')}" th:text="'workshop name ' + ${err}" />
+							</ul>
+						</div>
+
+						<!-- Address -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input type="text" th:field="*{address}" placeholder="address (*)" class="form-control" th:errorclass="fieldError" />
+						</div>
+						<div th:if="${#fields.hasErrors('address')}"
+							style="margin-bottom: 25px" class="text-danger">
+							<ul>
+							  <li th:each="err : ${#fields.errors('address')}" th:text="'address ' + ${err}" />
+							</ul>
+						</div>
+
+						<!-- Old Email -->
+						<input type="hidden" th:object="${wrapperString}" th:field="*{oldEmail}">
+
+						<!-- Email -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input type="text" th:field="*{email}" placeholder="email (*)" class="form-control" th:errorclass="fieldError" />
+						</div>
+						<div th:if="${#fields.hasErrors('email')}"
+							style="margin-bottom: 25px" class="text-danger">
+							<ul>
+							  <li th:each="err : ${#fields.errors('email')}" th:text="'Email ' + ${err}" />
+							</ul>
+						</div>
+
+						<!-- Phone number -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+							<input type="text" th:field="*{phoneNumber}" placeholder="phone number (*)" class="form-control" th:errorclass="fieldError" />
+						</div>
+						<div th:if="${#fields.hasErrors('phoneNumber')}"
+							 style="margin-bottom: 25px" class="text-danger">
+							<ul>
+								<li th:each="err : ${#fields.errors('phoneNumber')}" th:text="'Phone number ' + ${err}" />
+							</ul>
+						</div>
+
+						<!-- City -->
+						<div style="margin-bottom: 25px" class="input-group">
+							<select th:field="*{cityName}">
+								<option th:each="i : ${cities}" th:value="${i}" th:text="${i}"></option>
+							</select>
+						</div>
+
+						<div>
+							<a th:href="@{/employee/showChangePasswordForm}" class="btn btn-primary" role="button" aria-pressed="true">Change password</a>
+							<!-- мапінг на контроллер з addCar  -->
+						</div>
+
+						<!-- Update Button -->
+						<div style="margin-top: 10px" class="form-group">
+							<div class="col-sm-6 controls">
+								<button type="submit" class="btn btn-primary">Update</button>
+							</div>
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

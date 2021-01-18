@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <title>Add new car to employee Form</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Reference Bootstrap files -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+    <script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        .error {color:red}
+    </style>
+
+</head>
+
+<body>
+
+<div>
+
+    <div id="loginbox" style="margin-top: 50px;"
+         class="mainbox col-md-3 col-md-offset-2 col-sm-6 col-sm-offset-2">
+
+        <div class="panel panel-primary">
+
+            <div class="panel-heading">
+                <div class="panel-title">Add new Car</div>
+            </div>
+
+            <div style="padding-top: 30px" class="panel-body">
+
+                <!-- Registration Form -->
+                <form th:action="@{/employee/processAddCar}"
+                      th:object="${carData}" method="POST"
+                      class="form-horizontal">
+
+                    <!-- Marque -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input type="text" th:field="*{marque}" placeholder="marque (*)" class="form-control" />
+                    </div>
+
+                    <div th:if="${#fields.hasErrors('marque')}"
+                         style="margin-bottom: 25px" class="text-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('marque')}" th:text="'Marque ' + ${err}" />
+                        </ul>
+                    </div>
+
+
+                    <!-- Model -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                        <input type="text" th:field="*{model}" placeholder="model (*)" class="form-control" />
+                    </div>
+                    <div th:if="${#fields.hasErrors('model')}"
+                         style="margin-bottom: 25px" class="text-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('model')}" th:text="'Model ' + ${err}" />
+                        </ul>
+                    </div>
+
+                    <!-- Year -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                        <input type="text" th:field="*{year}" placeholder="year (*)" class="form-control" />
+                    </div>
+                    <div th:if="${#fields.hasErrors('year')}"
+                         style="margin-bottom: 25px" class="text-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('year')}" th:text="'Year ' + ${err}" />
+                        </ul>
+                    </div>
+
+
+                    <!-- vin -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input type="text" th:field="*{vin}" placeholder="VIN (*)" class="form-control" />
+                    </div>
+                    <div th:if="${#fields.hasErrors('vin')}"
+                         style="margin-bottom: 25px" class="text-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('vin')}" th:text="'VIN ' + ${err}" />
+                        </ul>
+                    </div>
+
+                    <!-- Registration number -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input type="text" th:text th:field="*{registrationNumber}" placeholder="registrationNumber (*)" class="form-control" />
+                    </div>
+                    <div th:if="${#fields.hasErrors('registrationNumber')}"
+                         style="margin-bottom: 25px" class="text-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('registrationNumber')}" th:text="'Registration Number ' + ${err}" />
+                        </ul>
+                    </div>
+
+                    <!-- Engine type -->
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <select th:field="*{engineType}">
+                            <option th:each="i : ${T(com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.EngineType).values()}"
+                                    th:value="${i}" th:text="${i}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Add Button -->
+                    <div style="margin-top: 10px" class="form-group">
+                        <div class="col-sm-6 controls">
+                            <button type="submit" class="btn btn-primary">Add Car</button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

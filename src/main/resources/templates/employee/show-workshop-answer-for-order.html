@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Workshop</title>
+</head>
+
+<body>
+<h2>Home Page</h2>
+<hr>
+
+
+<h4>Welcome</h4>
+
+<hr>
+
+<hr>
+
+
+<div>
+    <tr th:each="orderAnswerData : ${orderEmployeeData.orderAnswerDataList}">
+        <td th:text="${orderEmployeeData.description}"/>
+        <td th:text="${orderAnswerData.workshopData.workshopName}"/>
+        <td th:text="${orderAnswerData.workshopData.email}"/>
+        <td th:text="${orderAnswerData.implementationDate}"/>
+        <td th:text="${orderAnswerData.price}"/>
+
+        <form th:action="@{/employee/processOrderForImplementationChoose}"
+               method="POST"
+              class="form-horizontal">
+            <input type="hidden" th:value="${orderAnswerData.orderAnswerId}" name="orderAnswerId"/>
+            <div style="margin-top: 10px" class="form-group">
+                <div class="col-sm-6 controls">
+                    <button type="submit" class="btn btn-primary">submit order</button>
+                </div>
+            </div>
+        </form>
+        <br><br>
+    </tr>
+</div>
+
+<br><br><br>
+
+<hr>
+
+<!-- Add a logout button -->
+<form th:action="@{/logout}"
+      method="POST">
+
+    <input type="submit" value="Logout" />
+
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

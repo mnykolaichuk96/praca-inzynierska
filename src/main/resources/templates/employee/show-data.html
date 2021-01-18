@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <title>Workshop</title>
+</head>
+
+<body>
+<h2>Home Page</h2>
+<hr>
+
+
+<h4>Welcome</h4>
+
+<hr>
+
+<hr>
+
+
+<div>
+    <tr th:object="${employee}">
+        <td th:text="${employee.username}" />
+        <br>
+        <td th:text="${employee.firstName}" />
+        <br>
+        <td th:text="${employee.lastName}" />
+        <br>
+        <td th:text="${employee.phoneNumber}" />
+        <br>
+        <td th:text="${employee.email}" />
+    </tr>
+</div>
+
+<br><br><br>
+
+<hr>
+
+<!-- Add a logout button -->
+<form th:action="@{/logout}"
+      method="POST">
+
+    <input type="submit" value="Logout" />
+
+</form>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
