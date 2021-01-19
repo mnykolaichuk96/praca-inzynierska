@@ -9,4 +9,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>, Em
     public Employee findEmployeeById(Integer id);
     public Employee findEmployeeByEmployeeDetailEmail(String email);
 
+
 }

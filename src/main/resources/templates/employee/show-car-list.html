@@ -29,14 +29,15 @@
 
 <hr>
 
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
+<!-- мапінг на контроллер з addCar  -->
+<div>
+    <a th:href="@{/employee/showAddCarForm}" class="btn btn-primary" role="button" aria-pressed="true">Add car</a>
 
-    <input type="submit" value="Logout" />
-
-</form>
-
+</div>
+<!--мапінг на dashboard-->
+<div>
+    <a th:href="@{/employee/dashboard}" class="btn btn-primary" role="button" aria-pressed="true">home</a>
+</div>
 </body>
 
 </html>

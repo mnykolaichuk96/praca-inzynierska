@@ -29,24 +29,35 @@
         <input type="hidden" th:value="${orderEmployeeDataIterator.orderId}" name="orderId"/>
             <div style="margin-top: 10px" class="form-group">
                 <div class="col-sm-6 controls">
-                    <button type="submit" class="btn btn-primary">submit order</button>
+                    <button type="submit" class="btn btn-primary">choose order</button>
                 </div>
             </div>
         </form>
     </tr>
+    <!--    мапінг на create order list-->
+    <div>
+        <a th:href="@{/employee/showCreateOrderForm}" class="btn btn-primary" role="button" aria-pressed="true">Create order</a>
+        <!-- мапінг на контроллер з addCar  -->
+    </div>
+<!--    мапінг на archiw order list-->
+    <div>
+        <a th:href="@{/employee/showCompletedOrderList}" class="btn btn-primary" role="button" aria-pressed="true">archiw order</a>
+        <!-- мапінг на контроллер з addCar  -->
+    </div>
+
+    <!--мапінг на dashboard-->
+    <div>
+        <a th:href="@{/employee/dashboard}" class="btn btn-primary" role="button" aria-pressed="true">home</a>
+    </div>
+
+
 </div>
 
 <br><br><br>
 
 <hr>
 
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
 
-    <input type="submit" value="Logout" />
-
-</form>
 
 </body>
 

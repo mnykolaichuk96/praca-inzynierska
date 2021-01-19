@@ -1,17 +1,14 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.impl;
 
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.AuthorityRepository;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.EmployeeDetailRepository;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.EmployeeRepository;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.*;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.EmailAlreadyExistException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.InvalidTokenException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.UserAlreadyExistException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.WrapperString;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Employee;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.EmployeeDetail;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.SecureToken;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.*;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.EmployeeData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.AuthorityEnum;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.Stan;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.AbstractService;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.EmployeeService;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.SecureTokenService;
@@ -42,6 +39,18 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
 
     @Autowired
     private EmployeeDetailRepository employeeDetailRepository;
+
+    @Autowired
+    private EmployeeCarRepository employeeCarRepository;
+
+    @Autowired
+    private CarRepository carRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderAnswerRepository orderAnswerRepository;
 
    @Override
     public void register(EmployeeData employeeData) throws UserAlreadyExistException, EmailAlreadyExistException {
@@ -131,14 +140,30 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
 
     @Override
     public EmployeeData getEmployeeDataByUsername(String username) {
-        EmployeeData employeeData =
-                copyProperties(findByUsername(username), findByUsername(username).getEmployeeDetail());
+        EmployeeData employeeData = new EmployeeData();
+        Employee employee = employeeRepository.findEmployeeByUsername(username);
+        BeanUtils.copyProperties(employee, employeeData);
+        BeanUtils.copyProperties(employeeDetailRepository.findEmployeeDetailByEmployeeUsername(username), employeeData);
+        employeeData.setMatchingPassword(employee.getPassword());
         return employeeData;
     }
 
     @Override
-    public void deleteById(int id) {
-        employeeRepository.deleteById(id);
+    public void deleteById(Integer id) {
+
+       for(EmployeeCar employeeCar : employeeCarRepository.findAllByEmployeeId(id)) {
+           carRepository.deleteById(employeeCar.getCarId());
+           employeeCarRepository.delete(employeeCar);
+       }
+       for(Order order : orderRepository.findAllByEmployeeDetail(employeeDetailRepository.findEmployeeDetailById(id))) {
+           if(order.getOrderAnswers().get(0).getStan()!= Stan.COMPLETED) {
+               orderRepository.deleteById(order.getId());
+           }
+           if(order.getOrderAnswers().get(0).getWorkshop() == null){
+               orderRepository.deleteById(order.getId());
+           }
+       }
+       employeeRepository.deleteById(id);
     }
 
     @Override

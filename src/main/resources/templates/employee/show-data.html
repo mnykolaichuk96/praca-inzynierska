@@ -18,16 +18,16 @@
 
 
 <div>
-    <tr th:object="${employee}">
-        <td th:text="${employee.username}" />
+    <tr th:object="${employeeData}">
+        <td th:text="${employeeData.username}" />
         <br>
-        <td th:text="${employee.firstName}" />
+        <td th:text="${employeeData.firstName}" />
         <br>
-        <td th:text="${employee.lastName}" />
+        <td th:text="${employeeData.lastName}" />
         <br>
-        <td th:text="${employee.phoneNumber}" />
+        <td th:text="${employeeData.phoneNumber}" />
         <br>
-        <td th:text="${employee.email}" />
+        <td th:text="${employeeData.email}" />
     </tr>
 </div>
 
@@ -35,11 +35,6 @@
 
 <hr>
 
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
-
-    <input type="submit" value="Logout" />
 
 </form>
 

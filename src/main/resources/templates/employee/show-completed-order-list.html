@@ -38,16 +38,17 @@
 </tr>
 </div>
 <br><br><br>
+<!--мапінг на my order list-->
+<div>
+        <a th:href="@{/employee/showOrderList}" class="btn btn-primary" role="button" aria-pressed="true"> order list</a>
+</div>
 
+<!--    мапінг на create order list-->
+<div>
+        <a th:href="@{/employee/showCreateOrderForm}" class="btn btn-primary" role="button" aria-pressed="true">Create order</a>
+        <!-- мапінг на контроллер з addCar  -->
+</div>
 <hr>
-
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
-
-    <input type="submit" value="Logout" />
-
-</form>
 
 </body>
 

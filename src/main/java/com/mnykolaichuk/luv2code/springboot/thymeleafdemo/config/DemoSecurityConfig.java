@@ -2,8 +2,6 @@ package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.config;
 
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.security.EmployeeUserDetailService;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.security.WorkshopUserDetailService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.EmployeeService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.WorkshopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,13 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
 
 	@Autowired
-	private WorkshopService workshopService;
-
-	@Autowired
-	private EmployeeService employeeService;
-
-	@Autowired
 	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+	@Autowired
+	private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
@@ -52,7 +47,8 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
 					.permitAll()    // дозволяємо бачити цю форму всім користувачам включно з незареєстрованими
 					.and()
 					.logout().permitAll()	//дозволяється доступ до фкнкціоналу log out для всіх користувачів
-//					.defaultLogoutSuccessHandlerFor()
+					.logoutUrl("/logout")
+					.logoutSuccessHandler(customLogoutSuccessHandler)
 					.and()
 					.exceptionHandling().accessDeniedPage("/access-denied");    // мепінг на метод з вьорсткою для помилки аутентикації
 

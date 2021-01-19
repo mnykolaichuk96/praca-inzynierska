@@ -23,7 +23,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.PERSIST)
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<OrderAnswer> orderAnswers;
 
     @ManyToOne

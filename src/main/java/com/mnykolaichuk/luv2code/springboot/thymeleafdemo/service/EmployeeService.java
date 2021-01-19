@@ -14,7 +14,7 @@ public interface EmployeeService {
     public void update(EmployeeData employeeData, WrapperString wrapperString)
             throws UserAlreadyExistException, EmailAlreadyExistException;
     public EmployeeData getEmployeeDataByUsername(String username);
-    public void deleteById(int id);
+    public void deleteById(Integer id);
     public Employee findByUsername(String username);
     public boolean comparePassword(String password, String encodePassword);
     public Employee findById(Integer id);

@@ -137,12 +137,11 @@ public class EmployeeController {
 //
 //    }
 
-    @GetMapping("/processDelete")
-    public String processDelete(
+    @GetMapping("/delete")
+    public String delete(
             @CurrentSecurityContext(expression = "authentication.name") String username
     ) {
-
-        int id = employeeService.findByUsername(username).getId();
+        Integer id = employeeDetailService.findByUsername(username).getId();
         employeeService.deleteById(id);
 
         return "redirect:/";
@@ -180,13 +179,13 @@ public class EmployeeController {
         return "redirect:/";
     }
 
-    @GetMapping("/showCars")
-    public String showEmployeeCars(Model model
+    @GetMapping("/showCarList")
+    public String showEmployeeCarList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
         List<Car> cars = carService.findAllCarsByUsername(username);
         model.addAttribute("cars", cars);
-        return "employee/show-cars";
+        return "employee/show-car-list";
     }
 
     //Create ordering
@@ -204,7 +203,7 @@ public class EmployeeController {
         model.addAttribute("localDateTime", LocalDateTime.now());
         model.addAttribute("cities", cityService.loadCites());
 
-        return "employee/create-order-form";
+        return "employee/show-create-order-form";
     }
 
     @PostMapping(value = "/addCarToOrder")
@@ -214,7 +213,7 @@ public class EmployeeController {
         model.addAttribute("orderEmployeeData", orderEmployeeData);
         model.addAttribute("localDateTime", LocalDateTime.now());
         model.addAttribute("cities", cityService.loadCites());
-        return "employee/create-order-form";
+        return "employee/show-create-order-form";
     }
 
     @PostMapping("/processCreateOrder")
@@ -225,20 +224,20 @@ public class EmployeeController {
 
         //form validation
         if (bindingResult.hasErrors()) {
-            return "employee/create-order-form";
+            return "show-create-order-form";
         }
         orderService.createOrder(username, orderEmployeeData);
-        return "redirect:/";
+        return "redirect:/employee/showOrderList";
     }
 
-    @GetMapping("/showOrdersForm")
-    public String showOrderForm(Model model
+    @GetMapping("/showOrderList")
+    public String showOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
         model.addAttribute("orderEmployeeData", new OrderEmployeeData());
         model.addAttribute
                 ("orderEmployeeDataList", orderService.getOrderEmployeeDataListByUsernameAndStanIsNotCompleted(username));
 
-        return "employee/show-orders";
+        return "employee/show-order-list";
     }
 
     @PostMapping("/processOrderChoose")
@@ -247,7 +246,7 @@ public class EmployeeController {
         OrderEmployeeData orderEmployeeData = orderService.getOrderEmployeeDataByOrderAndStanEqualsWorkshopAnswer
                         (orderService.findOrderById(orderId));
         model.addAttribute("orderEmployeeData", orderEmployeeData);
-        return "employee/show-workshop-answer-for-order";
+        return "employee/show-workshop-answer-list-for-order";
     }
 
     @PostMapping("/processOrderForImplementationChoose")
@@ -255,17 +254,25 @@ public class EmployeeController {
                                      Model model) {
 
         orderAnswerService.chooseOrderAnswerForImplementation(orderAnswerService.findById(orderAnswerId));
-        return "redirect:/";
+        return "redirect:/employee/dashboard";
     }
 
-    @GetMapping("/showCompletedOrders")
-    public String showCompletedOrders(Model model
+    @GetMapping("/showCompletedOrderList")
+    public String showCompletedOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
         List<OrderEmployeeData> orderEmployeeDataList
                 = orderService.getOrderEmployeeDataListByUsernameAndStanEqualsCompleted(username);
         model.addAttribute
                 ("orderEmployeeDataList", orderEmployeeDataList);
-        return "employee/show-completed-orders";
+        return "employee/show-completed-order-list";
+    }
+
+    @GetMapping("/showOption")
+    public String showShowOption(Model model
+            , @CurrentSecurityContext(expression = "authentication.name") String username) {
+        model.addAttribute
+                ("employeeData", employeeService.getEmployeeDataByUsername(username));
+        return "employee/show-option";
     }
 
 }

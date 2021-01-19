@@ -31,7 +31,7 @@
             <input type="hidden" th:value="${orderAnswerData.orderAnswerId}" name="orderAnswerId"/>
             <div style="margin-top: 10px" class="form-group">
                 <div class="col-sm-6 controls">
-                    <button type="submit" class="btn btn-primary">submit order</button>
+                    <button type="submit" class="btn btn-primary">choose order</button>
                 </div>
             </div>
         </form>
@@ -43,13 +43,27 @@
 
 <hr>
 
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
+<!--мапінг на my order list-->
+<div>
+    <a th:href="@{/employee/showOrderList}" class="btn btn-primary" role="button" aria-pressed="true">my order list</a>
+</div>
 
-    <input type="submit" value="Logout" />
+<!--    мапінг на create order list-->
+<div>
+    <a th:href="@{/employee/showCreateOrderForm}" class="btn btn-primary" role="button" aria-pressed="true">Create order</a>
+    <!-- мапінг на контроллер з addCar  -->
+</div>
 
-</form>
+<!--мапінг на archiw order list-->
+<div>
+    <a th:href="@{/employee/showCompletedOrderList}" class="btn btn-primary" role="button" aria-pressed="true">archiw order list</a>
+</div>
+
+
+<!--мапінг на dashboard-->
+<div>
+    <a th:href="@{/employee/dashboard}" class="btn btn-primary" role="button" aria-pressed="true">home</a>
+</div>
 
 </body>
 
