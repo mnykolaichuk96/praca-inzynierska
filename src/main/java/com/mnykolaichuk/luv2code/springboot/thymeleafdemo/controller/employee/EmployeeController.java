@@ -176,7 +176,7 @@ public class EmployeeController {
             e.printStackTrace();
         }
 
-        return "redirect:/";
+        return "redirect:/employee/dashboard";
     }
 
     @GetMapping("/showCarList")

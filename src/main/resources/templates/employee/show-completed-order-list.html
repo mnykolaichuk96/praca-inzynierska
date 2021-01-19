@@ -23,13 +23,19 @@
 
         <td th:text="${orderEmployeeDataIterator.description}"/>
         <td th:text="${orderEmployeeDataIterator.creationDate}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.marque}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.model}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.year}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.engineType}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.registrationNumber}"/>
-        <td th:text="${orderEmployeeDataIterator.carData.vin}"/>
+        <br>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).implementationDate}"/>
+        <br>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).price}"/>
+        <br>
         <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.workshopName}"/>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.cityName}"/>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.address}"/>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.email}"/>
+        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.phoneNumber}"/>
+        <br>
+        <td th:text="${orderEmployeeDataIterator.carData.registrationNumber}"/>
+
 
 
 

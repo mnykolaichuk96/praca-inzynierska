@@ -19,9 +19,11 @@
 
 <div>
     <tr th:each="orderAnswerData : ${orderEmployeeData.orderAnswerDataList}">
-        <td th:text="${orderEmployeeData.description}"/>
         <td th:text="${orderAnswerData.workshopData.workshopName}"/>
+        <td th:text="${orderAnswerData.workshopData.address}"/>
         <td th:text="${orderAnswerData.workshopData.email}"/>
+        <td th:text="${orderAnswerData.workshopData.phoneNumber}"/>
+        <br><br>
         <td th:text="${orderAnswerData.implementationDate}"/>
         <td th:text="${orderAnswerData.price}"/>
 
