@@ -224,7 +224,7 @@ public class EmployeeController {
 
         //form validation
         if (bindingResult.hasErrors()) {
-            return "show-create-order-form";
+            return "employee/show-create-order-form";
         }
         orderService.createOrder(username, orderEmployeeData);
         return "redirect:/employee/showOrderList";
