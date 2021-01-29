@@ -27,6 +27,7 @@ public class City {
     public City() {
     }
 
+
     public City(String cityName) {
         this.cityName = cityName;
     }

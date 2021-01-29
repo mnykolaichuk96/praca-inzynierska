@@ -1,86 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-
 <head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/styles.css}">
 	<title>Workshop</title>
 </head>
-
 <body>
-	<h2>Home Page</h2>
-	<hr>
-	
-	<p>
-	Welcome to the workshop company home page!
-	</p>
-	
-	<hr>
-	
-	<!-- display user name and role -->
-<!--	-->
-<!--	<div>-->
-<!--		User: <span sec:authentication="name"></span>-->
-<!--		<br><br>-->
-<!--		Role(s): <span sec:authentication="principal.authorities"></span>-->
-<!--		<br><br>-->
 
-<!--		&lt;!&ndash; Check for login error &ndash;&gt;																	-->
-<!--		<div th:if="${session.user}" >-->
-<!--			<p th:text="'First name: ' + ${session.user.firstName} + ', Last name: ' + ${session.user.lastName} + ', Email: ' + ${session.user.email}"></p>-->
-<!--		</div>		-->
-<!--	</div>-->
-<!--	-->
-<!--	<div sec:authorize="hasRole('ROLE_MANAGER')">-->
-<!--	-->
-<!--		&lt;!&ndash; Add a link to point to /leaders ... this is for the managers &ndash;&gt;-->
-<!--		-->
-<!--		<p>-->
-<!--			<a th:href="@{/leaders}">Leadership Meeting</a>-->
-<!--			(Only for Manager peeps)-->
-<!--		</p>-->
 
-<!--	</div>	-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<div class="container">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
+				<li class="nav-item">
+					<a class="nav-link" aria-current="page" href="#">Home</a>
+				</li>
+				<div class="center-links d-flex">
+					<li class="nav-item">
+						<a th:href="@{/register/employee/showRegistrationForm}" type="button" class="nav-link">Register New User</a>
+						<!-- мапінг на контроллер з формаою реєстрації  -->
+					</li>
+					<div class="divider">
+						|
+					</div>
+					<li class="nav-item">
+						<a th:href="@{/register/workshop/showRegistrationForm}" type="button" class="nav-link">Register New Workshop</a>
+						<!--  мапінг на контроллер з формаою реєстрації  &ndash;&gt; -->
+					</li>
+				</div>
 
-<!--	<div sec:authorize="hasRole('ROLE_ADMIN')">  -->
+				<li class="nav-item">
+					<a th:href="@{/login}" type="button" class="nav-link">LogIn</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<section>
+<div class="form-group">
+	<div class="col-xs-15">
+		<div>
 
-<!--		&lt;!&ndash; Add a link to point to /systems ... this is for the admins &ndash;&gt;-->
-<!--		-->
-<!--		<p>-->
-<!--			<a th:href="@{/systems}">IT Systems Meeting</a>-->
-<!--			(Only for Admin peeps)-->
-<!--		</p>-->
-<!--	-->
-<!--	</div>-->
+			<!-- Check for registration error -->
+			<div th:if="${message}" class="alert alert-success col-xs-offset-1 col-xs-10">
+				<span th:text="${message}"></span>
+			</div>
+			<div th:if="${errorMessage}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+				<span th:text="${errorMessage}"></span>
+			</div>
 
-	<hr>
+		</div>
+	</div>
+</div>
+</section>
 
-	<div>
-		<a th:href="@{/register/employee/showRegistrationForm}" class="btn btn-primary" role="button" aria-pressed="true">Register New User</a>
-		<!-- мапінг на контроллер з формаою реєстрації  -->
+<section class="create-order">
+	<div class="container">
+		<div class="create-order__wrapper">
+			<h2 class="create-order__title">Choose your service!</h2>
+			<div class="create_order__desrc">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, laboriosam!</div>
+			<a th:href="@{/showAddCarToOrderForm}" type="button" class="btn btn-secondary create-order__btn" aria-pressed="true">Create order</a>
+		</div>
+	</div>
+</section>
+
+<section class="home">
+	<div class="container">
+		<div class="card text-white bg-dark mb-3" style="margin-top: 35px;">
+			<div class="row g-0">
+				<div class="col-md-7">
+					<div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+						<div class="carousel-inner">
+							<div class="carousel-item active" data-bs-interval="10000">
+								<img src="img/general-car-repair-CA-Motor-Works.jpg" class="d-block w-100" alt="...">
+							</div>
+							<div class="carousel-item" data-bs-interval="2000">
+								<img src="img/general-car-repair-CA-Motor-Works.jpg" class="d-block w-100" alt="...">
+							</div>
+							<div class="carousel-item">
+								<img src="img/general-car-repair-CA-Motor-Works.jpg" class="d-block w-100" alt="...">
+							</div>
+						</div>
+						<a class="carousel-control-prev" href="#carouselExampleInterval" role="button" data-bs-slide="prev">
+							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Previous</span>
+						</a>
+						<a class="carousel-control-next" href="#carouselExampleInterval" role="button" data-bs-slide="next">
+							<span class="carousel-control-next-icon" aria-hidden="true"></span>
+							<span class="visually-hidden">Next</span>
+						</a>
+					</div>
+				</div>
+				<div class="col-md-5">
+					<div class="card-body offer-right-side">
+						<h1 class="card-title offer-title">Welcome</h1>
+						<p class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. A, iure saepe eaque delectus sunt voluptates deserunt accusantium sed ea dignissimos amet harum asperiores laboriosam perspiciatis ratione nam similique provident quos enim architecto.</p>
+						<p class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. A, iure saepe eaque delectus sunt voluptates deserunt accusantium sed ea dignissimos amet harum asperiores laboriosam perspiciatis ratione nam similique provident quos enim architecto.</p>
+						<p class="card-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. A, iure saepe eaque delectus sunt voluptates deserunt accusantium sed ea dignissimos amet harum asperiores laboriosam perspiciatis ratione nam similique provident quos enim architecto.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<section>
+	<!-- мій message треба переробити----------------------------------------------------------------------------------------------------------------------------->
+
+	<!-- Place for messages: error, alert etc ... -->
+	<!-- Place for messages: error, alert etc ... -->
+
+	<!--	доступ до виведення списку всіх міст в яких є наші сервіси-->
+	<div th:each="city : ${cityList}">
+		<p th:text="${city}"/>
 	</div>
 
-	<br><br><br>
+	<!----------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
-	<div>
-		<a th:href="@{/register/workshop/showRegistrationForm}" class="btn btn-primary" role="button" aria-pressed="true">Register New Workshop</a>
-		<!-- мапінг на контроллер з формаою реєстрації  -->
-	</div>
+</section>
 
-	<hr>
-	
-	<!-- Add a logout button -->
-	<form th:action="@{/login}"
-			   method="GET">
-	
-		<input type="submit" value="LogIn" />
-	
-	</form>	
-			
+<!-- Optional JavaScript; choose one of the two! -->
+
+<!-- Option 1: Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+<!-- Option 2: Separate Popper and Bootstrap JS -->
+<!--
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+-->
 </body>
-
 </html>
-
-
-
 
 
 

@@ -1,48 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-
 <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
     <title>Workshop</title>
 </head>
-
 <body>
-<h2>Home Page</h2>
-<hr>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="#">Welcome, <span th:text="${workshopData.workshopName}"></span></a>
+                </li>
+                <div class="center-links d-flex">
+                    <li class="nav-item">
+                        <a th:href="@{/workshop/showOption}" type="button" class="nav-link" aria-pressed="true">Options</a>
+                        <!-- &lt;!&ndash; мапінг на контроллер з формаою реєстрації  &ndash;&gt; -->
+                    </li>
+                </div>
 
+                <li class="nav-item">
+                    <a th:href="@{/login}" type="button" class="nav-link">LogIn</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<section class="create-order">
+    <div class="container">
+        <div class="create-order__wrapper">
+            <h2 class="create-order__title">Choose your service!</h2>
+            <div class="create_order__desrc">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, laboriosam!</div>
+            <a th:href="@{/workshop/showCreatedOrderList}" type="button" class="btn btn-secondary create-order__btn" aria-pressed="true">Nowe Zlecenia</a>
+        </div>
+    </div>
+</section>
+<!----------------------------------------------------------------------------->
+<!-- Place for messages: error, alert etc ... -->
+<div class="form-group">
+    <div class="col-xs-15">
+        <div>
 
-<h4>Welcome<h2 th:text="${loginedWorkshop.workshopName}"/></h4>
+            <!-- Check for registration error -->
+            <div th:if="${message}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+                <span th:text="${message}"></span>
+            </div>
 
-<hr>
-
-<hr>
-
-<<div>
-    <a th:href="@{/workshop/processDelete}" class="btn btn-primary" role="button" aria-pressed="true">Delete</a>
-    <!-- мапінг на контроллер з addCar  -->
+        </div>
+    </div>
 </div>
-<div>
-    <a th:href="@{/workshop/showData}" class="btn btn-primary" role="button" aria-pressed="true">Show data</a>
-    <!-- мапінг на контроллер з addCar  -->
-</div>
+<!------------------------------------------------------------------------------>
 
-<!--мапінг на update-->
-<div>
-    <a th:href="@{/workshop/showUpdateForm}" class="btn btn-primary" role="button" aria-pressed="true">Show update</a>
-    <!-- мапінг на контроллер з addCar  -->
-</div>
-
-<br><br><br>
-
-<hr>
-
-<!-- Add a logout button -->
-<form th:action="@{/logout}"
-      method="POST">
-
-    <input type="submit" value="Logout" />
-
-</form>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>
 
 </html>

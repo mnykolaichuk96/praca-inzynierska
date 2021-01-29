@@ -2,12 +2,17 @@ package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao;
 
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 public interface CarRepository extends JpaRepository<Car, Integer> {
 
-    public Car findCarById(int id);
-    public Car findCarByVinAndRegistrationNumberAndEmployeesIsNotNull(String vin, String registrationNumber);
-    public List<Car> findAllCarByVinAndEmployeesIsNotNull(String vin);
-    public List<Car> findAllCarByVinAndEmployeesIsNull(String vin);
-    public Car findCarByVinAndRegistrationNumberAndEmployeesIsNull(String vin, String registrationNumber);
+    Car findCarById(int id);
+    Car findCarByVinAndRegistrationNumberAndEmployeesIsNotNull(String vin, String registrationNumber);
+    Car findCarByVinAndRegistrationNumberAndEmployeesIsNull(String vin, String registrationNumber);
+
+    @Transactional
+    @Modifying
+    @Query("delete from Car c where c.id=:id")
+    void deleteCarById(Integer id);
 }

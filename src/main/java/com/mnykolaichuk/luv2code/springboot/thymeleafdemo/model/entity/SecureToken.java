@@ -30,6 +30,9 @@ public class SecureToken {
     @Column(name = "expire_at")
     private LocalDateTime expireAt;
 
+    @Column(name = "not_new_employee_detail")
+    private Boolean notNewEmployeeDetail;
+
    @ManyToOne
    @JoinColumn(name = "employee_detail_id")
    private EmployeeDetail employeeDetail;
@@ -99,6 +102,14 @@ public class SecureToken {
 
     public void setExpired(boolean expired) {
         isExpired = expired;
+    }
+
+    public Boolean isNotNewEmployeeDetail() {
+        return notNewEmployeeDetail;
+    }
+
+    public void setNotNewEmployeeDetail(Boolean newEmployeeDetail) {
+        this.notNewEmployeeDetail = newEmployeeDetail;
     }
 
     public EmployeeDetail getEmployeeDetail() {

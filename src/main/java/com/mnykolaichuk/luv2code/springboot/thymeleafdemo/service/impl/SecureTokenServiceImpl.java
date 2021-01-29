@@ -2,6 +2,7 @@ package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.impl;
 
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.SecureTokenRepository;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Car;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.EmployeeDetail;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.SecureToken;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.SecureTokenService;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -60,6 +61,8 @@ public class SecureTokenServiceImpl implements SecureTokenService {
 
     @Override
     public void removeToken(SecureToken token) {
+        token.setEmployeeDetail(null);
+        token.setWorkshop(null);
         secureTokenRepository.delete(token);
     }
 
@@ -68,7 +71,16 @@ public class SecureTokenServiceImpl implements SecureTokenService {
         secureTokenRepository.removeByToken(token);
     }
 
-    public int getTokenValidityInSeconds() {
+    @Override
+    public SecureToken findByEmployeeDetail(EmployeeDetail employeeDetail) {
+        try {
+            return secureTokenRepository.findByEmployeeDetail(employeeDetail);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    private int getTokenValidityInSeconds() {
         return tokenValidityInSeconds;
     }
 }

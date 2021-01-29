@@ -24,9 +24,11 @@ public class EmployeeDetailData {
 
 	@ValidEmail
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String email;
 
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String phoneNumber;
 
 	public EmployeeDetailData() {

@@ -1,20 +1,20 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.controller.employee;
 
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.EmailAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.MyCarAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.UserAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.WrapperString;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Car;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.*;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.CarData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.EmployeeData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.OrderEmployeeData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -25,11 +25,13 @@ import java.util.List;
 @RequestMapping("/employee")
 public class EmployeeController {
     @Autowired
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
+
     @Autowired
-    CityService cityService;
+    private CityService cityService;
+
     @Autowired
-    CarService carService;
+    private CarService carService;
 
     @Autowired
     private EmployeeDetailService employeeDetailService;
@@ -40,63 +42,109 @@ public class EmployeeController {
     @Autowired
     private OrderAnswerService orderAnswerService;
 
+    @Autowired
+    private CarMakeService carMakeService;
+
+    @Autowired
+    private CarModelService carModelService;
+
+    @Value("${user.update.username.successful}")
+    private String userUpdateUsernameSuccessful;
+
+    @Value("${user.update.email.successful}")
+    private String userUpdateEmailSuccessful;
+
+    @Value("${user.add.car.exception}")
+    private String userAddCarException;
+
+    @Value("${user.delete.implementation.order.exception}")
+    private String userDeleteImplementationOrderException;
+
+    @Value("${user.update.success}")
+    private String userUpdateSuccessful;
+
+    @Value("${user.delete.account.success}")
+    private String userDeleteAccountSuccessful;
+
+    @Value("${order.delete.success}")
+    private String orderDeleteSuccessful;
+
+    @Value("${order.create.success}")
+    private String orderCreateSuccessful;
+
+    @Value("${car.delete.success}")
+    private String carDeleteSuccessful;
+
+    @Value("${car.add.success}")
+    private String carAddSuccessful;
 
     @GetMapping("/dashboard")
     public String showEmployeeDashboard(Model model
+            , @RequestParam(value = "message", required = false) String message
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
-        model.addAttribute("loggedEmployeeDetail", employeeDetailService.findByUsername(username));
+
+        model.addAttribute("message", message);
+        model.addAttribute("employeeDetail", employeeDetailService.findByEmployeeUsername(username));
         return "employee/dashboard";
     }
 
-    @GetMapping("/showData")
-    public String showData(Model model
-            , @CurrentSecurityContext(expression = "authentication.name") String username) {
-
-        model.addAttribute
-                ("employeeData", employeeService.getEmployeeDataByUsername(username));
-        return "employee/show-data";
-    }
+//    @GetMapping("/showData")
+//    public String showData(Model model
+//            , @CurrentSecurityContext(expression = "authentication.name") String username) {
+//
+//            model.addAttribute
+//                    ("employeeData", employeeService.getEmployeeDataByUsername(username));
+//        return "employee/show-data";
+//    }
 
     @GetMapping("/showUpdateForm")
     public String showUpdateForm(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
-
         EmployeeData employeeData = employeeService.getEmployeeDataByUsername(username);
-        WrapperString wrapperString = new WrapperString();
-        wrapperString.setOldUsername(employeeData.getUsername());
-        wrapperString.setOldEmail(employeeData.getEmail());
         model.addAttribute("employeeData", employeeData);
-        model.addAttribute("wrapperString", wrapperString);
+        model.addAttribute("oldUsername", employeeData.getUsername());
+        model.addAttribute("oldEmail", employeeData.getEmail());
+
         return "employee/update-form";
     }
 
     @PostMapping("/processUpdateForm")
-    public String processUpdateForm(
-            @Valid @ModelAttribute("employeeData") EmployeeData employeeData,
-            BindingResult bindingResult,
-            @ModelAttribute("wrapperString") WrapperString wrapperString,
-            Model model) {
-        // form validation
+    public ModelAndView processUpdateForm(Model model
+            , @Valid @ModelAttribute EmployeeData employeeData
+            , BindingResult bindingResult
+            , @ModelAttribute("oldUsername") String oldUsername
+            , @ModelAttribute("oldEmail") String oldEmail) {
+
+        RedirectView redirectView = new RedirectView();
+
         if (bindingResult.hasErrors()) {
-            System.out.println(employeeData);
-            model.addAttribute("employeeData", employeeData);
-            model.addAttribute("wrapperString", wrapperString);
-            return "employee/update-form";
+            return new ModelAndView("employee/update-form");
         }
-
         try {
-            employeeService.update(employeeData, wrapperString);
+            employeeService.update(employeeData, oldUsername, oldEmail);
         } catch (UserAlreadyExistException | EmailAlreadyExistException e) {
-            model.addAttribute("employeeData", employeeData);
-            model.addAttribute("wrapperString", wrapperString);
             model.addAttribute("updateError", e.getMessage());
-            return "employee/update-form";
+            return new ModelAndView("employee/update-form").addObject(model);
         }
 
-        if (employeeData.getUsername().equals(wrapperString.getOldUsername())) {
-            return "redirect:/";
+        if (employeeData.getUsername().equals(oldUsername) && employeeData.getEmail().equals(oldEmail)) {
+            redirectView.getAttributesMap().put("message", userUpdateSuccessful);
+            redirectView.setUrl("showOption");
+            return new ModelAndView(redirectView);
         }
-        return "redirect:/employee/showData";
+        if(!(employeeData.getUsername().equals(oldUsername) || employeeData.getEmail().equals(oldEmail))) {
+            redirectView.getAttributesMap().put("message", userUpdateUsernameSuccessful + userUpdateEmailSuccessful);
+        }
+        else {
+            if (!employeeData.getUsername().equals(oldUsername)) {
+                redirectView.getAttributesMap().put("message", userUpdateUsernameSuccessful);
+            }
+            if (!employeeData.getEmail().equals(oldEmail)) {
+                redirectView.getAttributesMap().put("message", userUpdateEmailSuccessful);
+            }
+        }
+        redirectView.setUrl("/login");
+        return new ModelAndView(redirectView);
     }
 //
 //    @GetMapping("/showChangePasswordForm")
@@ -137,142 +185,258 @@ public class EmployeeController {
 //
 //    }
 
-    @GetMapping("/delete")
-    public String delete(
-            @CurrentSecurityContext(expression = "authentication.name") String username
-    ) {
-        Integer id = employeeDetailService.findByUsername(username).getId();
-        employeeService.deleteById(id);
+    @GetMapping("/deleteAccount")
+    public ModelAndView deleteAccount(@CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        return "redirect:/";
+        RedirectView redirectView = new RedirectView();
+
+        employeeService.deleteByUsername(username);
+
+        redirectView.getAttributesMap().put("message", userDeleteAccountSuccessful);
+        redirectView.setUrl("/");
+        return new ModelAndView(redirectView);
     }
 
+    @PostMapping("/deleteOrder")
+    public ModelAndView deleteOrder(@RequestParam("orderId") Integer orderId
+            , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        RedirectView redirectView = new RedirectView();
+        orderService.deleteOrderFromEmployeeByOrderAndEmployeeUsername(orderService.findOrderById(orderId), username);
+
+        redirectView.getAttributesMap().put("message", orderDeleteSuccessful);
+        redirectView.setUrl("showOrderList");
+        return new ModelAndView(redirectView);
+    }
+
+    @PostMapping("/deleteCar")
+    public ModelAndView deleteCar(@RequestParam("carId") Integer carId
+            , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        RedirectView redirectView = new RedirectView();
+        employeeService.deleteEmployeeCarByCarIdAndUsername(carId, username);
+        redirectView.getAttributesMap().put("message", carDeleteSuccessful);
+        redirectView.setUrl("showCarList");
+        return new ModelAndView(redirectView);
+    }
 
     @GetMapping("/showAddCarForm")
-    public String showFormForAddCar(Model model) {
+    public String showCarForm(Model model
+            , @RequestParam(value = "make", required = false) String make) {
 
         CarData carData = new CarData();
+        if(make != null) {
+            carData.setMake(make);
+            model.addAttribute("carModelList", carModelService.loadCarModelList(carMakeService.findByMake(make)));
+        }
+
         model.addAttribute("carData", carData);
+        model.addAttribute("carMakeList", carMakeService.loadCarMakeList());
         return "employee/add-car-form";
     }
 
+     @PostMapping("/processCarMakeChoose")
+     public ModelAndView processCarMakeChoose(
+             @RequestParam("make") String make) {
+
+         RedirectView redirectView = new RedirectView();
+         redirectView.getAttributesMap().put("make", make);
+         redirectView.setUrl("showAddCarForm");
+         return new ModelAndView(redirectView);
+     }
+
     @PostMapping("/processAddCar")
-    public String processAddCar(@ModelAttribute("carData") CarData carData
+    public ModelAndView processAddCar(
+              @ModelAttribute("carData") @Valid CarData carData
             , BindingResult bindingResult
+            , @ModelAttribute("carModelList") ArrayList<String> carModelList
+            , @ModelAttribute("carMakeList") ArrayList<String> carMakeList
             , Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
+        RedirectView redirectView = new RedirectView();
 
-        //form validation
         if (bindingResult.hasErrors()) {
-            model.addAttribute("carData", carData);
-            return "employee/add-car-form";
+            carModelList.addAll(carModelService.loadCarModelList(carMakeService.findByMake(carData.getMake())));
+            carMakeList.addAll(carMakeService.loadCarMakeList());
+            return new ModelAndView("employee/add-car-form");
         }
+
 
         carData.setUsername(username);
         try {
             carService.save(carData);
         } catch (MyCarAlreadyExistException e) {
-            e.printStackTrace();
+            carModelList.addAll(carModelService.loadCarModelList(carMakeService.findByMake(carData.getMake())));
+            carMakeList.addAll(carMakeService.loadCarMakeList());
+            model.addAttribute("addCarError", userAddCarException);
+            return new ModelAndView("employee/add-car-form").addObject(model);
         }
-
-        return "redirect:/employee/dashboard";
+        redirectView.getAttributesMap().put("message", carAddSuccessful);
+        redirectView.setUrl("showCarList");
+        return new ModelAndView(redirectView);
     }
 
     @GetMapping("/showCarList")
     public String showEmployeeCarList(Model model
+            , @RequestParam(value = "message",required = false) String message
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        List<Car> cars = carService.findAllCarsByUsername(username);
-        model.addAttribute("cars", cars);
-        return "employee/show-car-list";
+        model.addAttribute("carDataList", carService.getCarDataListForEmployeeUsername(username));
+        model.addAttribute("message", message);
+        return "employee/car-list";
     }
 
     //Create ordering
-    @GetMapping("/showCreateOrderForm")
-    public String showCreateOrderForm(Model model
+    @GetMapping("/showAddCarToOrderForm")
+    public String showAddCarToOrderForm(Model model
+            , @RequestParam(value = "make", required = false) String make
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        List<Car> cars = carService.findAllCarsByUsername(username);
-        List<CarData> carDataList = new ArrayList<>();
-        for(Car car : cars) {
-            carDataList.add(carService.getCarData(car));
+        CarData carData = new CarData();
+        if(make != null) {
+            carData.setMake(make);
+            model.addAttribute("carModelList", carModelService.loadCarModelList(carMakeService.findByMake(make)));
         }
-        model.addAttribute("carDataList", carDataList);
-        model.addAttribute("orderEmployeeData", new OrderEmployeeData());
-        model.addAttribute("localDateTime", LocalDateTime.now());
-        model.addAttribute("cities", cityService.loadCites());
 
-        return "employee/show-create-order-form";
+        model.addAttribute("carDataList", carService.getCarDataListForEmployeeUsername(username));
+        model.addAttribute("carData", carData);
+        model.addAttribute("carMakeList", carMakeService.loadCarMakeList());
+        return "employee/add-car-to-order-form";
     }
 
-    @PostMapping(value = "/addCarToOrder")
-    public String addCarToOrder(@ModelAttribute("orderEmployeeData") OrderEmployeeData orderEmployeeData,
-                                Model model) {
-        System.out.println(orderEmployeeData.getCarData());
+    @PostMapping("/processCarMakeChooseToOrder")
+    public ModelAndView processCarMakeChooseToOrder(
+            @RequestParam("make") String make) {
+
+        RedirectView redirectView = new RedirectView();
+        redirectView.getAttributesMap().put("make", make);
+        redirectView.setUrl("showAddCarToOrderForm");
+        return new ModelAndView(redirectView);
+    }
+
+    @PostMapping("/processAddCarToOrder")
+    public ModelAndView processAddCarToOrder(
+            @ModelAttribute("carData") @Valid CarData carData
+            , BindingResult bindingResult
+            , @ModelAttribute("carModelList") ArrayList<String> carModelList
+            , @ModelAttribute("carMakeList") ArrayList<String> carMakeList
+            , RedirectAttributes redirectAttributes) {
+
+        RedirectView redirectView = new RedirectView();
+
+        if (bindingResult.hasErrors()) {
+            carModelList.addAll(carModelService.loadCarModelList(carMakeService.findByMake(carData.getMake())));
+            carMakeList.addAll(carMakeService.loadCarMakeList());
+            return new ModelAndView("employee/add-car-to-order-form");
+        }
+
+        redirectAttributes.addFlashAttribute("carData", carData);
+
+        redirectView.setUrl("showCreateOrderForm");
+        return new ModelAndView(redirectView);
+    }
+
+    @GetMapping("/showCreateOrderForm")
+    public String showCreateOrderForm(Model model) {
+        OrderEmployeeData orderEmployeeData = new OrderEmployeeData();
+        orderEmployeeData.setCarData((CarData) model.getAttribute("carData"));
+
         model.addAttribute("orderEmployeeData", orderEmployeeData);
-        model.addAttribute("localDateTime", LocalDateTime.now());
         model.addAttribute("cities", cityService.loadCites());
-        return "employee/show-create-order-form";
+        model.addAttribute("localDateTime", LocalDateTime.now());
+
+        return "employee/create-order-form";
     }
 
     @PostMapping("/processCreateOrder")
-    public String processCreateOrder(@ModelAttribute("orderEmployeeData") OrderEmployeeData orderEmployeeData
+    public ModelAndView processCreateOrder(@Valid OrderEmployeeData orderEmployeeData
             , BindingResult bindingResult
-            , Model model
+            , @ModelAttribute("cities") ArrayList<String> cities
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        //form validation
+        RedirectView redirectView = new RedirectView();
+
         if (bindingResult.hasErrors()) {
-            return "employee/show-create-order-form";
+            cities.addAll(cityService.loadCites());
+            return new ModelAndView("employee/create-order-form").addObject("localDateTime", LocalDateTime.now());
         }
-        orderService.createOrder(username, orderEmployeeData);
-        return "redirect:/employee/showOrderList";
+        try {
+            orderService.createOrder(username, orderEmployeeData);
+        } catch (NullWorkshopInCityException e) {
+            redirectView.getAttributesMap().put("message", e.getMessage());
+            redirectView.setUrl("dashboard");
+            return new ModelAndView(redirectView);
+        }
+        redirectView.getAttributesMap().put("message", orderCreateSuccessful);
+        redirectView.setUrl("showOrderList");
+        return new ModelAndView(redirectView);
     }
 
     @GetMapping("/showOrderList")
     public String showOrderList(Model model
+            , @RequestParam(value = "message",required = false) String message
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        List<OrderEmployeeData> orderEmployeeDataList;
+
+        orderEmployeeDataList = orderService.getOrderEmployeeDataListByUsernameAndStanIsNotCompleted(username);
+
+
         model.addAttribute("orderEmployeeData", new OrderEmployeeData());
         model.addAttribute
-                ("orderEmployeeDataList", orderService.getOrderEmployeeDataListByUsernameAndStanIsNotCompleted(username));
+                ("orderEmployeeDataList", orderEmployeeDataList);
+        model.addAttribute("message", message);
 
-        return "employee/show-order-list";
+        return "employee/order-list";
     }
 
     @PostMapping("/processOrderChoose")
-    public String processOrderChoose(@RequestParam("orderId") Integer orderId,
-                                     Model model) {
-        OrderEmployeeData orderEmployeeData = orderService.getOrderEmployeeDataByOrderAndStanEqualsWorkshopAnswer
-                        (orderService.findOrderById(orderId));
+    public ModelAndView processOrderChoose(Model model
+            ,@RequestParam("orderId") Integer orderId) {
+
+        OrderEmployeeData orderEmployeeData = null;
+        try {
+            orderEmployeeData = orderService.getOrderEmployeeDataByOrderAndStanEqualsWorkshopAnswer
+                            (orderService.findOrderById(orderId));
+        } catch (NullOrderAnswerForOrderException e) {
+            model.addAttribute("message",e.getMessage());
+            return new ModelAndView("employee/workshop-answer-list-for-order").addObject(model);
+        }
         model.addAttribute("orderEmployeeData", orderEmployeeData);
-        return "employee/show-workshop-answer-list-for-order";
+        return new ModelAndView("employee/workshop-answer-list-for-order");
     }
 
     @PostMapping("/processOrderForImplementationChoose")
-    public String processOrderForImplementationChoose(@RequestParam("orderAnswerId") Integer orderAnswerId,
-                                     Model model) {
+    public ModelAndView processOrderForImplementationChoose(@RequestParam("orderAnswerId") Integer orderAnswerId) {
 
         orderAnswerService.chooseOrderAnswerForImplementation(orderAnswerService.findById(orderAnswerId));
-        return "redirect:/employee/dashboard";
+
+        return new ModelAndView(new RedirectView("showOrderList"));
     }
 
     @GetMapping("/showCompletedOrderList")
     public String showCompletedOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
-        List<OrderEmployeeData> orderEmployeeDataList
-                = orderService.getOrderEmployeeDataListByUsernameAndStanEqualsCompleted(username);
+
+        List<OrderEmployeeData> orderEmployeeDataList;
+        orderEmployeeDataList = orderService.getOrderEmployeeDataListByUsernameAndStanEqualsCompleted(username);
+
         model.addAttribute
                 ("orderEmployeeDataList", orderEmployeeDataList);
-        return "employee/show-completed-order-list";
+        model.addAttribute("orderEmployeeData", new OrderEmployeeData());
+        return "employee/completed-order-list";
     }
 
     @GetMapping("/showOption")
     public String showShowOption(Model model
+            , @RequestParam(value = "message",required = false) String message
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        model.addAttribute("message", message);
         model.addAttribute
                 ("employeeData", employeeService.getEmployeeDataByUsername(username));
-        return "employee/show-option";
+        return "employee/option";
     }
 
 }

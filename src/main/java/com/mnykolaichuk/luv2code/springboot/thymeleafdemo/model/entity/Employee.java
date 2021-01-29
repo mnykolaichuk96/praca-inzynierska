@@ -22,7 +22,6 @@ public class Employee {
     private String token;
 
     @OneToOne
-    @MapsId
     @JoinColumn(name = "employee_detail_id")
     private EmployeeDetail employeeDetail;
 

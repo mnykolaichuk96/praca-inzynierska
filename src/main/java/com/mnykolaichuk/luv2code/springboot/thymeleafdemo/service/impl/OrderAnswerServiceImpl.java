@@ -1,16 +1,21 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.impl;
 
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.OrderAnswerRepository;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.WorkshopRepository;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.email.InformationEmailContext;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.CantDeleteWorkshopWhileImplementationExistException;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.email.CompletedEmailContext;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.email.ImplementationEmailContext;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.email.NoMoreOrderAnswerEmailContext;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.email.WorkshopAnswerEmailContext;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Authority;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Order;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.OrderAnswer;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.OrderAnswerData;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.AuthorityEnum;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.Stan;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.EmailService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.OrderAnswerService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.WorkshopService;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +33,10 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
     private WorkshopService workshopService;
 
     @Autowired
-    private WorkshopRepository workshopRepository;
+    private EmployeeService employeeService;
+
+    @Autowired
+    private OrderService orderService;
 
     @Autowired
     private EmailService emailService;
@@ -36,15 +44,24 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
     @Autowired
     private TaskExecutor taskExecutor;
 
-    private final String SHOW_DETAILS_URL="localhost:8080";
+    @Value("http://localhost:8080/employee/showOrderList")
+    private String SHOW_ORDER_LIST_URL;
+
+    @Value("http://localhost:8080/workshop/showImplementationOrderList")
+    private String SHOW_IMPLEMENTATION_ORDER_LIST_URL;
+
+    @Value("http://localhost:8080/employee/showCompletedOrderList")
+    private String SHOW_COMPLETED_ORDER_LIST_URL;
 
     @Override
     public OrderAnswerData getOrderAnswerData(OrderAnswer orderAnswer) {
         OrderAnswerData orderAnswerData = new OrderAnswerData();
         BeanUtils.copyProperties(orderAnswer, orderAnswerData);
         orderAnswerData.setOrderAnswerId(orderAnswer.getId());
-        orderAnswerData.setWorkshopData
-                (workshopService.getWorkshopDataByUsername(orderAnswer.getWorkshop().getUsername()));
+        if(isWorkshopInOrderAnswer(orderAnswer)) {
+            orderAnswerData.setWorkshopData
+                    (workshopService.getWorkshopDataByUsername(orderAnswer.getWorkshop().getUsername()));
+        }
         return orderAnswerData;
     }
 
@@ -57,39 +74,22 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
         return orderAnswerDataList;
     }
 
-
-
-    //    @Override
-//    public List<OrderAnswer> findAllByWorkshopAndStanEquals(String username, Stan stan) {
-//        List<OrderAnswer> orderAnswersWithStanEquals = new ArrayList<>();
-//        if(workshopRepository.findWorkshopByUsername(username) != null) {
-//            List<OrderAnswer> orderAnswers =
-//                    orderAnswerRepository.findAllOrderAnswerByWorkshops
-//                            (workshopRepository.findWorkshopByUsername(username));
-//        }
-//        else {
-//            List<OrderAnswer> orderAnswers =
-//                    orderAnswerRepository.findAllOrderAnswerByWorkshops
-//                            (workshopRepository.findWorkshopByUsername(username));
-//        }
-//        for (OrderAnswer orderAnswer : orderAnswers) {
-//            if(orderAnswer.getStan() == stan){
-//                orderAnswersWithStanEquals.add(orderAnswer);
-//            }
-//        }
-//        return orderAnswersWithStanEquals;
-//    }
-//
-//    @Override
-//    public List<OrderAnswer> findAllByUsernameAndStanEqualsCreated(String username) {
-//        return findAllByWorkshopAndStanEquals(workshopService.findByUsername(username), Stan.CREATED);
-//    }
-//
-
-
     @Override
     public OrderAnswer findById(Integer id) {
-        return orderAnswerRepository.findOrderAnswerById(id);
+        try {
+            return orderAnswerRepository.findOrderAnswerById(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<OrderAnswer> findAllByWorkshopUsername(String username) {
+        try {
+            return orderAnswerRepository.findAllByWorkshopUsername(username);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -100,7 +100,7 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
         orderAnswer.setPrice(orderAnswerData.getPrice());
         orderAnswer.setStan(Stan.WORKSHOP_ANSWER);
         orderAnswerRepository.save(orderAnswer);
-        sendInformationEmail(orderAnswer);
+        sendStanChangeEmail(orderAnswer);
     }
 
     @Override
@@ -112,58 +112,152 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
                 orderAnswerRepository.deleteOrderAnswerById(tempOrderAnswer.getId());
             }
         }
-        sendInformationEmail(orderAnswer);
+        sendStanChangeEmail(orderAnswer);
     }
 
     @Override
     public void chooseOrderAnswerForCompleted(OrderAnswer orderAnswer) {
         orderAnswer.setStan(Stan.COMPLETED);
         orderAnswerRepository.save(orderAnswer);
-        sendInformationEmail(orderAnswer);
+        sendStanChangeEmail(orderAnswer);
     }
-
-    private void sendInformationEmail(OrderAnswer orderAnswer) {
+    private void sendStanChangeEmail(OrderAnswer orderAnswer) {
 
         taskExecutor.execute(new Runnable() {
             @Override
-            public void run() { informationEmail(orderAnswer);
-
+            public void run() {
+                switch (orderAnswer.getStan()) {
+                    case WORKSHOP_ANSWER:stanWorkshopAnswerEmail(orderAnswer);
+                        break;
+                    case IMPLEMENTATION:stanImplementationEmail(orderAnswer);
+                        break;
+                    case COMPLETED:stanCompletedEmail(orderAnswer);
+                        break;
+                }
             }
         });
     }
+    private void stanWorkshopAnswerEmail(OrderAnswer orderAnswer) {
+        WorkshopAnswerEmailContext emailContext = new WorkshopAnswerEmailContext();
+        emailContext.init(orderAnswer);
+        emailContext.setInformationUrl(SHOW_ORDER_LIST_URL);
 
-    private void informationEmail(OrderAnswer orderAnswer) {
-        InformationEmailContext emailContext = new InformationEmailContext();
-        if(orderAnswer.getStan() == Stan.WORKSHOP_ANSWER || orderAnswer.getStan() == Stan.CREATED) {
-            emailContext.init(orderAnswer.getOrder().getEmployeeDetail());
-            emailContext.setInformationUrl(SHOW_DETAILS_URL);
-        }
-        else {
-            emailContext.init(orderAnswer.getWorkshop());
-            emailContext.setInformationUrl(SHOW_DETAILS_URL);
-        }
         try {
-            emailService.sendInformationMail(emailContext);
+            emailService.sendMail(emailContext);
         }
         catch (MessagingException e) {
             e.printStackTrace();
         }
     }
+
+    private void stanImplementationEmail(OrderAnswer orderAnswer) {
+        ImplementationEmailContext emailContext = new ImplementationEmailContext();
+        emailContext.init(orderAnswer);
+        emailContext.setInformationUrl(SHOW_IMPLEMENTATION_ORDER_LIST_URL);
+
+        try {
+            emailService.sendMail(emailContext);
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stanCompletedEmail(OrderAnswer orderAnswer) {
+        CompletedEmailContext emailContext = new CompletedEmailContext();
+        emailContext.init(orderAnswer);
+        emailContext.setInformationUrl(SHOW_COMPLETED_ORDER_LIST_URL);
+
+        try {
+            emailService.sendMail(emailContext);
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void save(OrderAnswer orderAnswer) {
+        orderAnswerRepository.save(orderAnswer);
+    }
+
+    @Override
+    public void delete(OrderAnswer orderAnswer) {
+        orderAnswerRepository.deleteOrderAnswerById(orderAnswer.getId());
+    }
+
+    @Override
+    public void deleteOrderAnswerFromWorkshopByOrderAnswerAndWorkshopUsername(OrderAnswer orderAnswer, String username) throws CantDeleteWorkshopWhileImplementationExistException {
+        if(orderAnswer.getStan() == Stan.CREATED || orderAnswer.getStan() == Stan.UNREGISTERED || orderAnswer.getStan() == Stan.WORKSHOP_ANSWER) {
+            //jeżeli tylko aktualnie zalogowany warsztat ma to zlecenie
+            if(orderAnswer.getOrder().getOrderAnswers().size() == 1) {
+                sendNoMoreOrderAnswerEmail(orderAnswer.getOrder());
+            }
+            orderAnswer.setOrder(null);
+            save(orderAnswer);
+            delete(orderAnswer);
+        }
+        if(orderAnswer.getStan() == Stan.IMPLEMENTATION){
+            Authority authority = new Authority();
+            authority.setAuthority(AuthorityEnum.ROLE_ADMIN);
+            if(employeeService.findByUsername(username) != null && employeeService.findByUsername(username).getAuthorities().contains(authority)) {
+                Order order = orderAnswer.getOrder();
+
+                orderAnswer.setOrder(null);
+                save(orderAnswer);
+                orderService.deleteOrderFromEmployeeByOrderAndEmployeeUsername(order,username);
+                orderAnswerRepository.deleteOrderAnswerById(orderAnswer.getId());
+            }
+            else {
+                throw new CantDeleteWorkshopWhileImplementationExistException("Zeby usunąć konto trzeba zakończyć wszystkie zlecenia");
+            }
+        }
+        if(orderAnswer.getStan() == Stan.COMPLETED) {
+            //jeżeli nie ma przypisanego EmployeeDetail usuwamy z bazy danych
+            if(!orderService.isEmployeeDetailInOrder(orderAnswer.getOrder())) {
+                Order order = orderAnswer.getOrder();
+                orderAnswer.setOrder(null);
+                save(orderAnswer);
+                orderService.deleteOrderFromEmployeeByOrderAndEmployeeUsername(order, username);
+                orderAnswerRepository.deleteOrderAnswerById(orderAnswer.getId());
+            }
+            else {
+                orderAnswer.setWorkshop(null);
+                save(orderAnswer);
+            }
+        }
+
+    }
+
+    private void sendNoMoreOrderAnswerEmail(Order order) {
+
+        taskExecutor.execute(new Runnable() {
+            @Override
+            public void run() { noMoreOrderAnswerEmail(order);
+
+            }
+        });
+    }
+
+    private void noMoreOrderAnswerEmail(Order order) {
+        NoMoreOrderAnswerEmailContext emailContext = new NoMoreOrderAnswerEmailContext();
+        emailContext.init(order);
+        try {
+            emailService.sendMail(emailContext);
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isWorkshopInOrderAnswer(OrderAnswer orderAnswer) {
+        try {
+            return orderAnswer.getWorkshop() != null ? true : false;
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
 }
-//
-//    @Override
-//    public void sendInformationEmail(Integer orderAnswerId) {
-//        EmployeeDetail employeeDetail =
-//                orderAnswerRepository.findOrderAnswerById(orderAnswerId).getOrder().getEmployeeDetail();
-//        InformationEmailContext emailContext = new InformationEmailContext();
-//        emailContext.init(employeeDetail);
-//        emailContext.setInformationUrl(SHOW_DETAILS_URL);
-//        try {
-//            emailService.sendInformationMail(emailContext);
-//        }
-//        catch (MessagingException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
+
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -19,7 +20,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#">Welcome, <span th:text="${employeeDetail.firstName}"></span> <span th:text="${employeeDetail.lastName}"></span></a>
+                    <a class="nav-link" aria-current="page" th:href="@{/employee/dashboard}">Home</a>
                 </li>
                 <div class="center-links d-flex">
                     <li class="nav-item">
@@ -56,41 +57,45 @@
         </div>
     </div>
 </nav>
-<section class="create-order">
-    <div class="container">
-        <div class="create-order__wrapper">
-            <h2 class="create-order__title">Choose your service!</h2>
-            <div class="create_order__desrc">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, laboriosam!</div>
-            <a th:href="@{/employee/showAddCarToOrderForm}" type="button" class="btn btn-secondary create-order__btn" aria-pressed="true">Create order</a>
-        </div>
-    </div>
-</section>
-<!----------------------------------------------------------------------------->
+
 <!-- Place for messages: error, alert etc ... -->
 <div class="form-group">
     <div class="col-xs-15">
         <div>
 
             <!-- Check for registration error -->
-            <div th:if="${message}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+            <div th:if="${message}" class="alert alert-success col-xs-offset-1 col-xs-10">
                 <span th:text="${message}"></span>
             </div>
 
         </div>
     </div>
 </div>
-<!------------------------------------------------------------------------------>
 
+<section class="show-existing-car">
+    <div class="container">
+        <div class="mycar-wrapper">
+            <th:block th:each="car: ${carDataList}">
+                <div class="mycar-form">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:text="${car.make}"></li>
+                        <li class="list-group-item" th:text="${car.model}"></li>
+                        <li class="list-group-item" th:text="${car.year}"></li>
+                        <li class="list-group-item" th:text="${car.registrationNumber}"></li>
+                        <li class="list-group-item" th:text="${car.engineType}"></li>
+                        <li class="list-group-item" th:text="${car.vin}"></li>
+
+                    </ul>
+                    <form th:action="@{/employee/deleteCar}"
+                          method="POST">
+                        <input type="hidden" th:value="${car.id}" name="carId"/>
+                        <button type="submit" class="btn btn-secondary">Delete</button>
+                    </form>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</section>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-

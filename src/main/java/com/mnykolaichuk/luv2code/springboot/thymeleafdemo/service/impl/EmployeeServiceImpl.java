@@ -1,32 +1,37 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.impl;
 
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.*;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.AuthorityRepository;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.dao.EmployeeRepository;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.EmailAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.InvalidTokenException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.UserAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.WrapperString;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.*;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Car;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Employee;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.EmployeeDetail;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Order;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.EmployeeData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.AuthorityEnum;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.Stan;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.AbstractService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.EmployeeService;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.SecureTokenService;
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.util.StringUtils;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class EmployeeServiceImpl extends AbstractService implements EmployeeService {
+public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private WorkshopService workshopService;
+
+    @Autowired
+    private CarService carService;
 
     @Autowired
     private AuthorityRepository authorityRepository;
@@ -35,36 +40,29 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private SecureTokenService secureTokenService;
+    private EmployeeDetailService employeeDetailService;
 
     @Autowired
-    private EmployeeDetailRepository employeeDetailRepository;
-
-    @Autowired
-    private EmployeeCarRepository employeeCarRepository;
-
-    @Autowired
-    private CarRepository carRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderAnswerRepository orderAnswerRepository;
+    private OrderService orderService;
 
    @Override
     public void register(EmployeeData employeeData) throws UserAlreadyExistException, EmailAlreadyExistException {
-        if(checkIfUserExist(employeeData.getUsername())) {
+       boolean isEmployeeDetailNotNew = false;
+       //sprawdza czy istnieje klient albo warsztat z takim username
+       if(checkIfUsernameExist(employeeData.getUsername())) {
+           //zeruje pole username objektu który będzie wysłany na Front End
             employeeData.setUsername(null);
             throw new UserAlreadyExistException("Podany username jest już zajęty");
         }
-        if(checkIfEmailExist(employeeData.getEmail())) {
-            //перевірка для того якщо юзер створив ордер не запеєстрований, він є в базі. хоче зареєструватися. щоб міг.
-            if(employeeDetailRepository.findEmployeeDetailByEmail(employeeData.getEmail()).getEmployee() != null) {
-                employeeData.setEmail(null);
-                throw new EmailAlreadyExistException("Podany adres e-mail jest już zajęty");
-            }
-        }
+       //sprawdza czy istnieje klient z takim email
+       if(checkIfEmailExist(employeeData.getEmail())) {
+           if (employeeDetailService.isEmployeeInEmployeeDetail(employeeDetailService.findByEmail(employeeData.getEmail()))) {
+               employeeData.setEmail(null);
+               throw new EmailAlreadyExistException("Podany adres e-mail jest już zajęty");
+           } else {
+               isEmployeeDetailNotNew = true;
+           }
+       }
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeData, employee);
         EmployeeDetail employeeDetail = new EmployeeDetail();
@@ -74,8 +72,12 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
                 (Stream.of(authorityRepository.findByAuthority(AuthorityEnum.ROLE_EMPLOYEE))
                 .collect(Collectors.toSet()));
         employee.setEmployeeDetail(employeeDetail);
+        employeeDetailService.save(employeeDetail);
         employeeRepository.save(employee);
-        sendRegistrationConfirmationEmail(employeeDetail);
+        if(isEmployeeDetailNotNew) {
+            employeeDetailService.sendNotNewEmployeeDetailEmailVerificationEmail(employeeDetail);
+        }
+        employeeDetailService.sendEmployeeDetailEmailVerificationEmail(employeeDetail);
     }
 
     private void encodePassword(EmployeeData source, Employee target) {
@@ -83,58 +85,46 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
     }
 
     @Override
-    public boolean verifyEmployee(String token) throws InvalidTokenException {
-        SecureToken secureToken = secureTokenService.findByToken(token);
-        if(Objects.isNull(secureToken) || !StringUtils.equals(token, secureToken.getToken()) || secureToken.isExpired()){
-            throw new InvalidTokenException("Token is not valid");
-        }
-        EmployeeDetail employeeDetail =
-                employeeDetailRepository.getOne(secureToken.getEmployeeDetail().getId());
-        if(Objects.isNull(employeeDetail)){
-            return false;
-        }
-        employeeDetail.setAccountVerified(true);
-        employeeDetailRepository.save(employeeDetail); // let's same user details
-
-        // we don't need invalid password now
-        secureTokenService.removeToken(secureToken);
-        return true;
-    }
-
-    @Override
-    public void update(EmployeeData employeeData, WrapperString wrapperString)
+    public void update(EmployeeData employeeData, String oldUsername, String oldEmail)
             throws UserAlreadyExistException, EmailAlreadyExistException {
         boolean isEmailChange = false;
         boolean isUsernameChange = false;
-        if(!employeeData.getUsername().equals(wrapperString.getOldUsername())) {
+        //jeżeli username został zmieniony
+        if(!employeeData.getUsername().equals(oldUsername)) {
             isUsernameChange = true;
-            if (checkIfUserExist(employeeData.getUsername())) {
+            //sprawdza czy nowy username nie jest zajęty przez innego użytkownika
+            if(checkIfUsernameExist(employeeData.getUsername())) {
                 employeeData.setUsername(null);
                 throw new UserAlreadyExistException("User already exist");
             }
         }
-        if(!employeeData.getEmail().equals(wrapperString.getOldEmail())) {
+        //jeżeli email został zmieniony
+        if(!employeeData.getEmail().equals(oldEmail)) {
             isEmailChange = true;
+            //sprawdza czy email adres nie jest wykorzystany przez innego klienta
             if (checkIfEmailExist(employeeData.getEmail())) {
                 employeeData.setEmail(null);
                 throw new EmailAlreadyExistException("Email address already used");
             }
         }
+        //jeżeli username został zmieniony aktualizuje nowy username w bazie danych
         if(isUsernameChange) {
-            Employee employee = employeeRepository.findEmployeeByUsername(wrapperString.getOldUsername());
+            Employee employee = employeeRepository.findEmployeeByUsername(oldUsername);
             employee.setUsername(employeeData.getUsername());
             employeeRepository.save(employee);
         }
+        //aktualizuje wszystkie dane klienta
         EmployeeDetail employeeDetail =
-                employeeRepository.findEmployeeByUsername(wrapperString.getOldUsername()).getEmployeeDetail();
+                employeeRepository.findEmployeeByUsername(employeeData.getUsername()).getEmployeeDetail();
         BeanUtils.copyProperties(employeeData, employeeDetail);
+        //jeżeli email został zmieniony, konto nie będzie ważne do weryfikacji nowego adresu email
         if(isEmailChange) {
             employeeDetail.setAccountVerified(false);
-            employeeDetailRepository.save(employeeDetail);
-            sendRegistrationConfirmationEmail(employeeDetail);
+            employeeDetailService.save(employeeDetail);
+            employeeDetailService.sendEmployeeDetailEmailVerificationEmail(employeeDetail);
         }
         else {
-            employeeDetailRepository.save(employeeDetail);
+            employeeDetailService.save(employeeDetail);
         }
     }
 
@@ -143,37 +133,64 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
         EmployeeData employeeData = new EmployeeData();
         Employee employee = employeeRepository.findEmployeeByUsername(username);
         BeanUtils.copyProperties(employee, employeeData);
-        BeanUtils.copyProperties(employeeDetailRepository.findEmployeeDetailByEmployeeUsername(username), employeeData);
+        BeanUtils.copyProperties(employeeDetailService.findByEmployeeUsername(username), employeeData);
         employeeData.setMatchingPassword(employee.getPassword());
+        employeeData.setEmployeeId(employee.getId());
         return employeeData;
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public List<EmployeeData> getAllEmployeeDataList() {
+       List<EmployeeData> allEmployeeDataList = new ArrayList<>();
+       List<Employee> allEmployeeList = employeeRepository.findAll();
+       allEmployeeList.remove(employeeRepository.findEmployeeById(1));
+       for(Employee employee : allEmployeeList) {
+           allEmployeeDataList.add(getEmployeeDataByUsername(employee.getUsername()));
+       }
+       return allEmployeeDataList;
+    }
 
-       for(EmployeeCar employeeCar : employeeCarRepository.findAllByEmployeeId(id)) {
-           carRepository.deleteById(employeeCar.getCarId());
-           employeeCarRepository.delete(employeeCar);
-       }
-       for(Order order : orderRepository.findAllByEmployeeDetail(employeeDetailRepository.findEmployeeDetailById(id))) {
-           if(order.getOrderAnswers().get(0).getStan()!= Stan.COMPLETED) {
-               orderRepository.deleteById(order.getId());
-           }
-           if(order.getOrderAnswers().get(0).getWorkshop() == null){
-               orderRepository.deleteById(order.getId());
+    @Override
+    public void deleteByUsername(String username) {
+       Employee employee = employeeRepository.findEmployeeByUsername(username);
+       //usuwa wszystkie samochody przypisane do klienta
+       if(isCarInEmployee(employee)) {
+           for (Car car : employee.getCars()) {
+               carService.deleteByCarAndEmployee(car, employee);
            }
        }
-       employeeRepository.deleteById(id);
+
+       //usuwa wszystkie zlecenia klienta
+        if(employeeDetailService.isOrderInEmployeeDetail(employee.getEmployeeDetail())) {
+            for (Order order : employee.getEmployeeDetail().getOrders()) {
+                orderService.deleteOrderFromEmployeeByOrderAndEmployeeUsername(order, username);
+            }
+        }
+        EmployeeDetail employeeDetail = employee.getEmployeeDetail();
+        employeeRepository.save(employee);
+        employeeRepository.deleteEmployeeById(employee.getId());
+        employeeDetailService.delete(employeeDetail);
+
+    }
+
+    @Override
+    public void deleteEmployeeCarByCarIdAndUsername(Integer carId, String username) {
+        Car car = carService.findById(carId);
+        carService.deleteByCarAndEmployee(car, findByUsername(username));
     }
 
     @Override
     public Employee findByUsername(String username) {
-        return employeeRepository.findEmployeeByUsername(username);
+        Employee employee = employeeRepository.findEmployeeByUsername(username);
+
+        return employee;
     }
 
     @Override
     public Employee findById(Integer id) {
-        return employeeRepository.findEmployeeById(id);
+        Employee employee = employeeRepository.findEmployeeById(id);
+
+        return employee;
     }
 
     @Override
@@ -185,26 +202,29 @@ public class EmployeeServiceImpl extends AbstractService implements EmployeeServ
         return false;
     }
 
-    private EmployeeData copyProperties(Employee employee, EmployeeDetail employeeDetail) {
-        System.out.println(employee.getUsername());
-        EmployeeData employeeData = new EmployeeData();
-        employeeData.setUsername(employee.getUsername());
-        System.out.println(employeeData.getUsername());
-        employeeData.setPassword(employee.getPassword());
-        employeeData.setMatchingPassword(employee.getPassword());
-        employeeData.setFirstName(employeeDetail.getFirstName());
-        employeeData.setLastName(employeeDetail.getLastName());
-        employeeData.setEmail(employeeDetail.getEmail());
-        employeeData.setPhoneNumber(employeeDetail.getPhoneNumber());
-
-        return employeeData;
-    }
-
-    private boolean checkIfUserExist(String username) {
-        return employeeRepository.findEmployeeByUsername(username) != null ? true : false;
+    private boolean checkIfUsernameExist(String username) {
+        return employeeRepository.findEmployeeByUsername(username) != null || workshopService.findByUsername(username) != null ? true : false;
     }
 
     private boolean checkIfEmailExist(String email) {
-        return employeeRepository.findEmployeeByEmployeeDetailEmail(email) != null ? true : false;
+        return employeeDetailService.findByEmail(email) != null ? true : false;
+    }
+
+    @Override
+    public boolean isCarInEmployee(Employee employee) {
+        try {
+            return employee.getCars() != null ? true : false;
+        } catch (NullPointerException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isEmployeeInEmployeeDetail(EmployeeDetail employeeDetail) {
+        try {
+            return employeeDetail.getEmployee() != null ? true : false;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 }

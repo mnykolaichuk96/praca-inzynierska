@@ -23,10 +23,10 @@ public class Order {
 
     @OneToMany(mappedBy = "order",
             fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.REFRESH})
     private List<OrderAnswer> orderAnswers;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "employee_detail_id")
     private EmployeeDetail employeeDetail;
 
@@ -97,4 +97,15 @@ public class Order {
         this.car = car;
     }
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", creationDate=" + creationDate +
+                ", orderAnswers=" + orderAnswers +
+                ", employeeDetail=" + employeeDetail +
+                ", city=" + city +
+                '}';
+    }
 }

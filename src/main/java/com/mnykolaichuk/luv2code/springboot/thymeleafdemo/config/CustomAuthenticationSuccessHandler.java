@@ -53,7 +53,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 				HttpSession session = request.getSession();
 				session.setAttribute("workshop", tempWorkshop);
 				break;
+			} else if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
+				redirectUrl = "/admin/dashboard";
+				Employee employee = employeeService.findByUsername(username);
+
+				// now place in the session
+				HttpSession session = request.getSession();
+				session.setAttribute("admin", employee);
+				break;
 			}
+
 		}
 		//forward to page page for role
 		response.sendRedirect(request.getContextPath() + redirectUrl);

@@ -11,4 +11,5 @@ public interface EmployeeCarRepository extends JpaRepository<EmployeeCar, Intege
     public List<EmployeeCar> findAllByCarId(Integer carId);
     public List<EmployeeCar> findAllByEmployeeId(Integer employeeId);
     public EmployeeCar findEmployeeCarByEmployeeIdAndCarId(Integer employeeId, Integer carId);
+
 }

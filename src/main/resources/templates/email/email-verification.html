@@ -344,18 +344,10 @@
                         <tr>
                             <td>
                                 <div class="text" style="padding: 0 2.5em; text-align: center;">
-                                    <h2>Finish creating your account.</h2>
-                                    <h3>Hi<p th:text="${firstName}"></h3>
-                                    <h3>We're excited to have you get started. First, you need to confirm your account. Just press the button below.</h3>
-                                    <p><a th:href="${verificationURL}" class="btn btn-primary">Validate Account</a></p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="text" style="padding: 0 2.5em; text-align: center;">
-                                    <h3>if you experience any issues with the button above, copy and paste the URL below into your web browser.</h3>
-                                    <p th:text="${verificationURL}"></p>
+                                    <h2>Verify your email address</h2>
+                                    <h3>Hi<p th:text="${name}"></h3>
+                                    <h3>We're excited to have you get started. First, you need to validate your email. Just press the button below.</h3>
+                                    <p><a th:href="${verificationURL}" class="btn btn-primary">Validate email</a></p>
                                 </div>
                             </td>
                         </tr>

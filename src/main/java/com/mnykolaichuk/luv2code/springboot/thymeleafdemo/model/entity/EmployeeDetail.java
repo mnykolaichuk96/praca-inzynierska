@@ -18,7 +18,7 @@ public class EmployeeDetail {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "phone_number")
@@ -33,13 +33,13 @@ public class EmployeeDetail {
     private Employee employee;
 
     @OneToMany(mappedBy = "employeeDetail",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.PERSIST)
+        fetch = FetchType.EAGER,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<SecureToken> tokens;
 
 
     @OneToMany(mappedBy = "employeeDetail",
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = CascadeType.PERSIST)
     private List<Order> orders;
 

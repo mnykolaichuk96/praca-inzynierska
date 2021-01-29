@@ -12,10 +12,12 @@ public class WorkshopData {
 
 	@ValidUsername
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String username;
 
 	@ValidPassword
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String password;
 
 	@ValidPassword
@@ -38,14 +40,25 @@ public class WorkshopData {
 
 	@ValidPhoneNumber
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String phoneNumber;
 
 	@NotNull(message = "is required")
 	@Size(min = 1, message = "is required")
 	private String cityName;
 
+	Integer workshopId;
+
 	public WorkshopData() {
 
+	}
+
+	public Integer getWorkshopId() {
+		return workshopId;
+	}
+
+	public void setWorkshopId(Integer workshopId) {
+		this.workshopId = workshopId;
 	}
 
 	public String getUsername() {
@@ -110,5 +123,19 @@ public class WorkshopData {
 
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
+	}
+
+	@Override
+	public String toString() {
+		return "WorkshopData{" +
+				"username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", matchingPassword='" + matchingPassword + '\'' +
+				", workshopName='" + workshopName + '\'' +
+				", address='" + address + '\'' +
+				", email='" + email + '\'' +
+				", phoneNumber='" + phoneNumber + '\'' +
+				", cityName='" + cityName + '\'' +
+				'}';
 	}
 }

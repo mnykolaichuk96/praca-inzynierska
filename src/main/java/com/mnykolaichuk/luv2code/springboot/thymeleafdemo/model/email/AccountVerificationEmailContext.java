@@ -15,17 +15,17 @@ public class AccountVerificationEmailContext extends AbstractEmailContext {
         // like setting up some base URL and context
         if(isFromEmployeeDetail(context)) {
             EmployeeDetail employeeDetail = (EmployeeDetail) context; // we pass the customer informati
-            put("firstName", employeeDetail.getFirstName() + " " + employeeDetail.getLastName());
+            put("name", employeeDetail.getFirstName() + " " + employeeDetail.getLastName());
             setTo(employeeDetail.getEmail());
         }
         else {
             Workshop workshop = (Workshop) context; // we pass the customer informati
-            put("firstName", workshop.getWorkshopName());
+            put("name", workshop.getWorkshopName());
             setTo(workshop.getEmail());
         }
         // here we set thymeleaf .html for view mail
-        setTemplateLocation("email-verification");
-        setSubject("Complete your registration");
+        setTemplateLocation("email/email-verification");
+        setSubject("Verify your email");
         setFrom("no-reply@javadevjournal.com");
     }
 
@@ -36,7 +36,7 @@ public class AccountVerificationEmailContext extends AbstractEmailContext {
 
     public void buildVerificationUrl(final String baseURL, final String token){
         final String url= UriComponentsBuilder.fromHttpUrl(baseURL)
-                .path("/register/verify").queryParam("token", token).toUriString();
+                .path("/verify/user").queryParam("token", token).toUriString();
         put("verificationURL", url);
     }
 }

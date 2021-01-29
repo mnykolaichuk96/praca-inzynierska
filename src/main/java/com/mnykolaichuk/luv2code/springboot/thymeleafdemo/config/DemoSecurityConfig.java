@@ -20,9 +20,6 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
 	private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
 	@Autowired
-	private CustomLogoutSuccessHandler customLogoutSuccessHandler;
-
-	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
 
@@ -30,8 +27,9 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
 		protected void configure(HttpSecurity http) throws Exception {    //HttpSecurity використовується для конфігурації spraing security
 
 			http.authorizeRequests()    // обмежуємо доступ на основі входящого httpServletRequest
-					.antMatchers("/").permitAll()           // тут ми вказуємо до яких мепінгів будуть мати доступ які ролі
+					.antMatchers("/**").permitAll()           // тут ми вказуємо до яких мепінгів будуть мати доступ які ролі
 					.antMatchers("/register/**").permitAll()
+					.antMatchers("/admin/**").hasRole("ADMIN")
 					.antMatchers("/employee/**").hasRole("EMPLOYEE")    // /** -- all sub-directories
 					.antMatchers("/workshop/**").hasRole("WORKSHOP")
 					//.hasAnyAuthority()	дозволяє перечислити ролі для доступу
@@ -46,11 +44,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter{
 					.successHandler(customAuthenticationSuccessHandler)
 					.permitAll()    // дозволяємо бачити цю форму всім користувачам включно з незареєстрованими
 					.and()
-					.logout().permitAll()	//дозволяється доступ до фкнкціоналу log out для всіх користувачів
-					.logoutUrl("/logout")
-					.logoutSuccessHandler(customLogoutSuccessHandler)
-					.and()
-					.exceptionHandling().accessDeniedPage("/access-denied");    // мепінг на метод з вьорсткою для помилки аутентикації
+					.logout().permitAll();	//дозволяється доступ до фкнкціоналу log out для всіх користувачів
 
 		}
 

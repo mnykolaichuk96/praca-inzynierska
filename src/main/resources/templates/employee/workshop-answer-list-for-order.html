@@ -19,12 +19,17 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#">Welcome, <span th:text="${employeeDetail.firstName}"></span> <span th:text="${employeeDetail.lastName}"></span></a>
+                    <a class="nav-link" aria-current="page" th:href="@{/employee/dashboard}">Home</a>
                 </li>
                 <div class="center-links d-flex">
                     <li class="nav-item">
-                        <a th:href="@{/employee/showOrderList}" type="button" class="nav-link" aria-pressed="true">Order List</a>
-                        <!-- мапінг на контроллер з формаою реєстрації  -->
+                        <a th:href="@{/employee/showOrderList}" type="button" class="nav-link" aria-pressed="true">Order list</a>
+                    </li>
+                    <div class="divider">
+                        |
+                    </div>
+                    <li class="nav-item">
+                        <a th:href="@{/employee/showCompletedOrderList}" type="button" class="nav-link" aria-pressed="true">Archiw order</a>
                     </li>
                     <div class="divider">
                         |
@@ -56,31 +61,63 @@
         </div>
     </div>
 </nav>
-<section class="create-order">
-    <div class="container">
-        <div class="create-order__wrapper">
-            <h2 class="create-order__title">Choose your service!</h2>
-            <div class="create_order__desrc">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, laboriosam!</div>
-            <a th:href="@{/employee/showAddCarToOrderForm}" type="button" class="btn btn-secondary create-order__btn" aria-pressed="true">Create order</a>
-        </div>
-    </div>
-</section>
-<!----------------------------------------------------------------------------->
 <!-- Place for messages: error, alert etc ... -->
 <div class="form-group">
     <div class="col-xs-15">
         <div>
 
             <!-- Check for registration error -->
-            <div th:if="${message}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+            <div th:if="${message}" class="alert alert-success col-xs-offset-1 col-xs-10">
                 <span th:text="${message}"></span>
             </div>
 
         </div>
     </div>
 </div>
-<!------------------------------------------------------------------------------>
+<section class="order-list">
+    <div class="container">
+        <div>
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Workshop Name</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Phone number</th>
+                    <th scope="col">Implementation date</th>
+                    <th scope="col">Price</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${message} == null or ${message} == ''"
+                    th:each="orderAnswerData : ${orderEmployeeData.orderAnswerDataList}">
+                    <td class="scope">1</td>
+                    <td th:text="${orderAnswerData.workshopData.workshopName}"/>
+                    <td th:text="${orderAnswerData.workshopData.cityName}"/>
+                    <td th:text="${orderAnswerData.workshopData.address}"/>
+                    <td th:text="${orderAnswerData.workshopData.phoneNumber}"/>
+                    <td  th:text="${orderAnswerData.implementationDate}"/>
+                    <td  th:text="${orderAnswerData.price}"/>
+                    <td>
+                        <form th:action="@{/employee/processOrderForImplementationChoose}" method="POST">
+                            <input type="hidden" th:value="${orderAnswerData.orderAnswerId}" name="orderAnswerId"/>
+                            <button type="submit" class="btn btn-secondary">Wybrać warsztat</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+                <!--                <div style="margin-top: 10px" class="form-group">-->
+                <!--                    <div class="col-sm-6 controls">-->
+                <!--                    </div>-->
 
+                <!--                </div>-->
+            </table>
+        </div>
+    </div>
+</section>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>
 

@@ -4,6 +4,7 @@ import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.validation.FieldMatch;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class OrderEmployeeData implements Serializable {
 
     @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String description;
 
     @NotNull(message = "is required")
@@ -22,6 +24,7 @@ public class OrderEmployeeData implements Serializable {
 
 
     @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String cityName;
 
     private Integer orderId;

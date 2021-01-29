@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <title>Workshop</title>
 </head>
+
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -19,7 +21,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="#">Welcome, <span th:text="${employeeDetail.firstName}"></span> <span th:text="${employeeDetail.lastName}"></span></a>
+                    <a th:href="@{/employee/dashboard}" type="button" class="nav-link" aria-pressed="true">Home</a>
                 </li>
                 <div class="center-links d-flex">
                     <li class="nav-item">
@@ -50,36 +52,62 @@
                 </div>
 
                 <li class="nav-item">
-                    <a th:href="@{/login}" type="button" class="nav-link">LogIn</a>
+                    <form name="logoutForm" th:action="@{/logout}" class="nav-link" method="post">
+                        <input type="submit" class="nav-link" value="Log Out"/>
+                    </form>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
-<section class="create-order">
+<section class="user-page">
     <div class="container">
-        <div class="create-order__wrapper">
-            <h2 class="create-order__title">Choose your service!</h2>
-            <div class="create_order__desrc">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, laboriosam!</div>
-            <a th:href="@{/employee/showAddCarToOrderForm}" type="button" class="btn btn-secondary create-order__btn" aria-pressed="true">Create order</a>
-        </div>
-    </div>
-</section>
-<!----------------------------------------------------------------------------->
-<!-- Place for messages: error, alert etc ... -->
-<div class="form-group">
-    <div class="col-xs-15">
-        <div>
-
-            <!-- Check for registration error -->
-            <div th:if="${message}" class="alert alert-danger col-xs-offset-1 col-xs-10">
-                <span th:text="${message}"></span>
+        <div class="user-page__content" th:object="${employeeData}">
+            <div class="card">
+                <img src="../img/avatar.png" class="card-img-top" alt="avatar">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${employeeData.username}"></h5>
+                    <a th:href="@{/employee/showOption}" class="btn btn-secondary" role="button" aria-pressed="true">Show data</a>
+                </div>
             </div>
-
+            <div class="user-page__table">
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th scope="row">Fullname</th>
+                        <td colspan="3"><span th:text="${employeeData.firstName}"></span> <span th:text="${employeeData.lastName}"></span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Username</th>
+                        <td colspan="3" th:text="${employeeData.username}"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Phone</th>
+                        <td colspan="3" th:text="${employeeData.phoneNumber}"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td colspan="3" th:text="${employeeData.email}"></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2"></td>
+                        <td class="col-2">
+                            <a th:href="@{/employee/showUpdateForm}" class="nav-link" role="button" aria-pressed="true">Update</a>
+                        </td>
+                        <td class="col-2">
+                            <a th:href="@{/employee/}" class="nav-link" role="button" aria-pressed="true">Change password</a>
+                        </td>
+                        <td class="col-2">
+                            <a th:href="@{/employee/deleteAccount}" class="nav-link" role="button" aria-pressed="true">Delete account</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-<!------------------------------------------------------------------------------>
+
+</section>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>

@@ -1,22 +1,24 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.controller.workshop;
 
+import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.CantDeleteWorkshopWhileImplementationExistException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.EmailAlreadyExistException;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.exception.UserAlreadyExistException;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.WrapperString;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entity.Workshop;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.OrderAnswerData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.OrderWorkshopData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData.WorkshopData;
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
-
 import java.util.List;
 
 @Controller
@@ -37,68 +39,80 @@ public class WorkshopController {
     @Autowired
     private OrderAnswerService orderAnswerService;
 
+    @Value("${user.update.username.successful}")
+    private String userUpdateUsernameSuccessful;
+
+    @Value("${user.update.email.successful}")
+    private String userUpdateEmailSuccessful;
+
+    @Value("${user.add.car.exception}")
+    private String userAddCarException;
+
+    @Value("user.delete.implementation.order.exception")
+    private String userDeleteImplementationOrderException;
+
+    @Value("${user.delete.account.success}")
+    private String userDeleteAccountSuccessful;
+
+    @Value("${order.delete.success}")
+    private String orderDeleteSuccessful;
+
     @GetMapping("/dashboard")
     public String showWorkshopDashboard(Model model
                                     , @CurrentSecurityContext(expression = "authentication.name") String username) {
-        Workshop workshop = new Workshop();
-        workshop = workshopService.findByUsername(username);
-        model.addAttribute("loginedWorkshop",workshop);
+
+        model.addAttribute("workshopData",workshopService.getWorkshopDataByUsername(username));
         return "workshop/dashboard";
-    }
-
-    @GetMapping("/showData")
-    public String showData(Model model
-            , @CurrentSecurityContext(expression = "authentication.name") String username) {
-
-        Workshop workshop = workshopService.findByUsername(username);
-        model.addAttribute("workshop", workshop);
-        return "workshop/show-data";
     }
 
     @GetMapping("/showUpdateForm")
     public String showUpdateForm(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        WorkshopData workshopData = workshopService.getWorkshopDataByUsername(username);
-        WrapperString wrapperString = getWrapperString();
-        wrapperString.setOldUsername(workshopData.getUsername());    // Old Username
-        wrapperString.setOldEmail(workshopData.getEmail());         //Old Email
-        model.addAttribute("workshopData", workshopData);
-        model.addAttribute("wrapperString", wrapperString);
+        model.addAttribute("workshopData", workshopService.getWorkshopDataByUsername(username));
         model.addAttribute("cities", cityService.loadCites());
         return "workshop/update-form";
     }
 
     @PostMapping("/processUpdateForm")
-    public String processUpdateForm(
-            @Valid @ModelAttribute("workshopData") WorkshopData workshopData,
-            BindingResult bindingResult,
-            @ModelAttribute("wrapperString") WrapperString wrapperString,
-            Model model) {
-        // form validation
+    public ModelAndView processUpdateForm(Model model
+            , @Valid WorkshopData workshopData
+            , BindingResult bindingResult
+            , @RequestParam("oldUsername") String oldUsername
+            , @RequestParam("oldEmail") String oldEmail) {
+
+        RedirectView redirectView = new RedirectView();
+
         if (bindingResult.hasErrors()) {
-            model.addAttribute("wrapperString", wrapperString);
-            model.addAttribute("cities", cityService.loadCites());
-            model.addAttribute("workshopData", workshopData);
-            return "workshop/update-form";
+            return new ModelAndView("workshop/update-form");
         }
 
         try {
-            workshopService.update(workshopData, wrapperString);
+            workshopService.update(workshopData, oldUsername, oldEmail);
         }
         catch (UserAlreadyExistException | EmailAlreadyExistException e){
-            model.addAttribute("workshopData", workshopData);
             model.addAttribute("updateError", e.getMessage());
-            return "workshop/update-form";
+            return new ModelAndView("workshop/update-form").addObject(model);
         }
 
-        if(workshopData.getUsername().equals(wrapperString.getOldEmail())){
-            return "redirect:/";
+        if (workshopData.getUsername().equals(oldUsername) && workshopData.getEmail().equals(oldEmail)) {
+            redirectView.setUrl("showOption");
+            return new ModelAndView(redirectView);
         }
-        return "redirect:/workshop/showData";
+        if(!(workshopData.getUsername().equals(oldUsername) || workshopData.getEmail().equals(oldEmail))) {
+            redirectView.getAttributesMap().put("message", userUpdateUsernameSuccessful + userUpdateEmailSuccessful);
+        }
+        else {
+            if (!workshopData.getUsername().equals(oldUsername)) {
+                redirectView.getAttributesMap().put("message", userUpdateUsernameSuccessful);
+            }
+            if (!workshopData.getEmail().equals(oldEmail)) {
+                redirectView.getAttributesMap().put("message", userUpdateEmailSuccessful);
+            }
+        }
+        redirectView.setUrl("/login");
+        return new ModelAndView(redirectView);
     }
-
-    private WrapperString getWrapperString() {return new WrapperString();}
 
 //    @GetMapping("/showChangePasswordForm")
 //    public String showChangePasswordForm(Model model
@@ -138,178 +152,110 @@ public class WorkshopController {
 //
 //    }
 
-    @GetMapping("/processDelete")
-    public String processDelete(
-            @CurrentSecurityContext(expression = "authentication.name") String username
-            ) {
+    @GetMapping("/deleteAccount")
+    public ModelAndView deleteAccount(@CurrentSecurityContext(expression = "authentication.name") String username) {
 
-        int id = workshopService.findByUsername(username).getId();
-        workshopService.deleteById(id);
-        return "redirect:/";
+        RedirectView redirectView = new RedirectView();
+        try {
+            workshopService.deleteByUsername(username);
+        } catch (CantDeleteWorkshopWhileImplementationExistException e) {
+            redirectView.getAttributesMap().put("message", userDeleteImplementationOrderException);
+            redirectView.setUrl("showImplementationOrderList");
+            return new ModelAndView(redirectView);
+        }
+
+        redirectView.getAttributesMap().put("message", userDeleteAccountSuccessful);
+        redirectView.setUrl("/");
+        return new ModelAndView(redirectView);
     }
 
-    @GetMapping("/showCreatedOrders")
-    public String showCreatedOrders(Model model
+    @PostMapping("/deleteOrder")
+    public ModelAndView deleteOrder(@RequestParam("orderAnswerId") Integer orderAnswerId,
+                              @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        RedirectView redirectView = new RedirectView();
+        try {
+            orderAnswerService.deleteOrderAnswerFromWorkshopByOrderAnswerAndWorkshopUsername
+                    (orderAnswerService.findById(orderAnswerId), username);
+        } catch (CantDeleteWorkshopWhileImplementationExistException e) {
+            e.getStackTrace();
+        }
+        redirectView.getAttributesMap().put("message", orderDeleteSuccessful);
+        redirectView.setUrl("showCreatedOrderList");
+        return new ModelAndView(redirectView);
+    }
+
+    @GetMapping("/showCreatedOrderList")
+    public String showCreatedOrderList(Model model
+            , @RequestParam(value = "message", required = false) String message
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
         List<OrderWorkshopData> orderWorkshopDataList
                 = orderService.getOrderWorkshopDataListByUsernameAndStanEqualsCreated(username);
-        model.addAttribute("orderAnswerData", new OrderAnswerData());
+        if (model.asMap().size() == 0) {
+            model.addAttribute("orderAnswerData", new OrderAnswerData());
+        }
         model.addAttribute
                 ("orderWorkshopDataList", orderWorkshopDataList);
-        return "workshop/show-created-orders";
+        if(message != null) {
+            model.addAttribute("message", message);
+        }
+        return "workshop/created-order-list";
     }
 
-//    @GetMapping("/showOrderCreated")
-//    public String showOrderCreated(Model model
-//            , @CurrentSecurityContext(expression = "authentication.name") String username) {
-//        List<OrderEmployeeData> orderDataList =
-//                orderService.getOrderDataListByUsernameAndStanEqualsCreated(username);
-//        model.addAttribute("orderDataList", orderDataList);
-//        model.addAttribute("orderDataAnswer", new OrderWorkshopData());
-//        return "workshop/show-order-created";
-//    }
-//
-//
     @PostMapping("/processOrderChoose")
-    public String processOrderChoose(
-            @Valid @ModelAttribute("orderAnswerData") OrderAnswerData orderAnswerData,
-            BindingResult bindingResult,
-            Model model) {
-       orderAnswerService.createWorkshopAnswerByOrderAnswerData(orderAnswerData);
-//        return "redirect:/";
-//         form validation
-//        if (bindingResult.hasErrors()) {
-//            model.addAttribute("wrapperString", wrapperString);
-//            model.addAttribute("cities", cityService.loadCites());
-//            model.addAttribute("workshopData", workshopData);
-//            return "workshop/update-form";
-//        }
-//
-//        try {
-//            workshopService.update(workshopData, wrapperString);
-//        }
-//        catch (UserAlreadyExistException | EmailAlreadyExistException e){
-//            model.addAttribute("workshopData", workshopData);
-//            model.addAttribute("updateError", e.getMessage());
-//            return "workshop/update-form";
-//        }
-//
-//        if(workshopData.getUsername().equals(wrapperString.getOldEmail())){
-//            return "redirect:/";
-//        }
-        return "redirect:/workshop/showData";
+    public ModelAndView processOrderChoose(
+            @Valid @ModelAttribute("orderAnswerData") OrderAnswerData orderAnswerData
+            , BindingResult bindingResult
+            , RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.orderAnswerData", bindingResult);
+            redirectAttributes.addFlashAttribute("orderAnswerData", orderAnswerData);
+            return new ModelAndView(new RedirectView("showCreatedOrderList"));
+        }
+        orderAnswerService.createWorkshopAnswerByOrderAnswerData(orderAnswerData);
+        return new ModelAndView(new RedirectView("showCreatedOrderList"));
     }
 
-    @GetMapping("/showImplementationOrders")
-    public String showImplementationOrders(Model model
+    @GetMapping("/showImplementationOrderList")
+    public String showImplementationOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
         List<OrderWorkshopData> orderWorkshopDataList
                 = orderService.getOrderWorkshopDataListByUsernameAndStanEqualsImplementation(username);
         model.addAttribute("orderAnswerData", new OrderAnswerData());
         model.addAttribute
                 ("orderWorkshopDataList", orderWorkshopDataList);
-        return "workshop/show-implementation-orders";
+        model.addAttribute("message", null);
+        return "workshop/implementation-order-list";
     }
 
     @PostMapping("/processOrderCompleted")
-    public String processOrderCompleted(@RequestParam("orderAnswerId") Integer orderAnswerId) {
+    public ModelAndView processOrderCompleted(@RequestParam("orderAnswerId") Integer orderAnswerId) {
 
         orderAnswerService.chooseOrderAnswerForCompleted(orderAnswerService.findById(orderAnswerId));
-        return "redirect:/workshop/showData";
+        return new ModelAndView(new RedirectView("showCreatedOrderList"));
     }
 
-    @GetMapping("/showCompletedOrders")
-    public String showCompletedOrders(Model model
+    @GetMapping("/showCompletedOrderList")
+    public String showCompletedOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
         List<OrderWorkshopData> orderWorkshopDataList
                 = orderService.getOrderWorkshopDataListByUsernameAndStanEqualsCompleted(username);
         model.addAttribute
                 ("orderWorkshopDataList", orderWorkshopDataList);
-        return "workshop/show-completed-orders";
+        return "workshop/completed-order-list";
+    }
+
+    @GetMapping("/showOption")
+    public String showShowOption(Model model
+            , @CurrentSecurityContext(expression = "authentication.name") String username) {
+
+        model.addAttribute
+                ("workshopData", workshopService.getWorkshopDataByUsername(username));
+        return "workshop/option";
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @GetMapping("/employees")
-//    public String getAllEmployees(Model model) {
-//        List<Employee> employees = employeeService.findAll();
-//        model.addAttribute("employees", employees);
-//
-//        return "user/all-employees";
-//    }
-
-//    @GetMapping("/showFormForAdd")
-//    public String showFormForAdd(Model model) {
-//        Employee tempEmployee = new Employee();
-//        model.addAttribute("employee", tempEmployee);
-//
-//        return "user/employee-form";
-//    }
-
-//    @PostMapping("/save")
-//    public String saveEmployee(@ModelAttribute("employee") Employee employee) {
-//        employeeService.save(employee);
-//        return "redirect:/user/employees";
-//    }
-//
-//    @GetMapping("/showFormForUpdate")
-//    public String showFormForUpdate(@RequestParam("employeeId") int id, Model model) {
-//        Employee employee = employeeService.findById(id);
-//        model.addAttribute("employee", employee);
-//
-//        return "user/employee-form";
-//    }
-//
-//    @GetMapping("/delete")
-//    public String deleteEmployee(@RequestParam("employeeId") int id) {
-//        employeeService.deleteById(id);
-//
-//        return "redirect:/user/employees";
-//    }
-
-//    @GetMapping("/repairTypes")
-//    public String getAllRepairTypes(Model model) {
-//        List<RepairType> repairTypes = repairTypeService.findAll();
-//        model.addAttribute("repairTypes", repairTypes);
-//
-//        return "user/all-employees";
-//    }
-
-//    @GetMapping("/cities")
-//    public String getAllCities(Model model) {
-//        Employee employee = new Employee();
-//        List<City> cities = cityService.findAll();
-//        model.addAttribute("cities", cities);
-//        model.addAttribute("employee", employee);
-//
-//        return "user/all-employees";
-//    }
-
-
-
-
-
-
-
-
-
-
-

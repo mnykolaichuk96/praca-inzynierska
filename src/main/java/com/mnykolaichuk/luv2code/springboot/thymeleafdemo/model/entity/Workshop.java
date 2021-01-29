@@ -36,7 +36,7 @@ public class Workshop {
 
     @OneToMany(mappedBy = "workshop",
             fetch = FetchType.LAZY,
-            cascade = CascadeType.PERSIST)
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Set<SecureToken> tokens;
 
     @ManyToOne

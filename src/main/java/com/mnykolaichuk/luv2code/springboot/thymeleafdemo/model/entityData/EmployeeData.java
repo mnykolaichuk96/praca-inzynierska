@@ -13,14 +13,17 @@ public class EmployeeData implements Serializable {
 
 	@ValidUsername
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String username;
 
 	@ValidPassword
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String password;
 
 	@ValidPassword
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String matchingPassword;
 
 	@ValidName
@@ -35,14 +38,26 @@ public class EmployeeData implements Serializable {
 
 	@ValidEmail
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String email;
 
 	@ValidPhoneNumber
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String phoneNumber;
+
+	private Integer employeeId;
 
 	public EmployeeData() {
 
+	}
+
+	public Integer getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public String getUsername() {

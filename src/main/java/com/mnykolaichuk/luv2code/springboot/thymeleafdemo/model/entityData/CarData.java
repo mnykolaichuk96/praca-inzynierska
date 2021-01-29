@@ -1,25 +1,26 @@
 package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData;
 
 import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.EngineType;
-import com.mnykolaichuk.luv2code.springboot.thymeleafdemo.validation.FieldMatch;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import javax.validation.constraints.Size;
 
-@FieldMatch.List({
-    @FieldMatch(first = "password", second = "matchingPassword", message = " muszą byc jednakowe")
-})
-public class CarData implements Serializable {
+public class CarData {
 
-	@NotNull(message = "is required")
-	private String marque;
+	private Integer id;
 
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
+	private String make;
+
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String model;
 
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String year;
 
 	@Enumerated(EnumType.STRING)
@@ -27,9 +28,11 @@ public class CarData implements Serializable {
 	private EngineType engineType;
 
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String registrationNumber;
 
 	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String vin;
 
 	private String username;
@@ -38,12 +41,21 @@ public class CarData implements Serializable {
 
 	}
 
-	public String getMarque() {
-		return marque;
+
+	public Integer getId() {
+		return id;
 	}
 
-	public void setMarque(String marque) {
-		this.marque = marque;
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getMake() {
+		return make;
+	}
+
+	public void setMake(String make) {
+		this.make = make;
 	}
 
 	public String getModel() {
@@ -97,7 +109,7 @@ public class CarData implements Serializable {
 	@Override
 	public String toString() {
 		return "CarData{" +
-				"marque='" + marque + '\'' +
+				"make='" + make + '\'' +
 				", model='" + model + '\'' +
 				", year='" + year + '\'' +
 				", engineType=" + engineType +

@@ -3,10 +3,12 @@ package com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.entityData;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class OrderWorkshopData {
     @NotNull(message = "is required")
+    @Size(min = 1, message = "is required")
     private String description;
 
     @NotNull(message = "is required")
@@ -78,5 +80,18 @@ public class OrderWorkshopData {
 
     public void setCarData(CarData carData) {
         this.carData = carData;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderWorkshopData{" +
+                "description='" + description + '\'' +
+                ", creationDate=" + creationDate +
+                ", cityName='" + cityName + '\'' +
+                ", orderAnswerId=" + orderAnswerId +
+                ", orderAnswerData=" + orderAnswerData +
+                ", employeeDetailData=" + employeeDetailData +
+                ", carData=" + carData +
+                '}';
     }
 }

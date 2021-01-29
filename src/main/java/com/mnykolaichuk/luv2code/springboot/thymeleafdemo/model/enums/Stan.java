@@ -4,5 +4,6 @@ public enum Stan {
     CREATED,
     WORKSHOP_ANSWER,
     IMPLEMENTATION,
-    COMPLETED
+    COMPLETED,
+    UNREGISTERED
 }

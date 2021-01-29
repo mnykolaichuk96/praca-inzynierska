@@ -1,139 +1,162 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-
-    <title>Add new car to employee Form</title>
-
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Reference Bootstrap files -->
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-
-    <script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-    <style>
-        .error {color:red}
-    </style>
-
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Add new car to employee Form</title>
 </head>
-
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0 justify-content-between w-100">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" th:href="@{/employee/dashboard}">Home</a>
+                </li>
+                <div class="center-links d-flex">
+                    <li class="nav-item">
+                        <a th:href="@{/employee/showOrderList}" type="button" class="nav-link" aria-pressed="true">Order List</a>
+                        <!-- мапінг на контроллер з формаою реєстрації  -->
+                    </li>
+                    <div class="divider">
+                        |
+                    </div>
+                    <li class="nav-item">
+                        <a th:href="@{/employee/showAddCarForm}" type="button" class="nav-link" aria-pressed="true">Add car</a>
+                        <!-- &lt;!&ndash; мапінг на контроллер з формаою реєстрації  &ndash;&gt; -->
+                    </li>
+                    <div class="divider">
+                        |
+                    </div>
+                    <li class="nav-item">
+                        <a th:href="@{/employee/showCarList}" type="button" class="nav-link" aria-pressed="true">Show car</a>
+                        <!-- &lt;!&ndash; мапінг на контроллер з формаою реєстрації  &ndash;&gt; -->
+                    </li>
+                    <div class="divider">
+                        |
+                    </div>
+                    <li class="nav-item">
+                        <a th:href="@{/employee/showOption}" type="button" class="nav-link" aria-pressed="true">Options</a>
+                        <!-- &lt;!&ndash; мапінг на контроллер з формаою реєстрації  &ndash;&gt; -->
+                    </li>
+                </div>
 
-<div>
+                <li class="nav-item">
+                    <a th:href="@{/login}" type="button" class="nav-link">LogIn</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-    <div id="loginbox" style="margin-top: 50px;"
-         class="mainbox col-md-3 col-md-offset-2 col-sm-6 col-sm-offset-2">
+<section class="add-new-car">
+    <div class="container">
+        <div class="workshop-form">
+            <div class="form-group">
+                <div class="col-xs-15">
+                    <div>
 
-        <div class="panel panel-primary">
+                        <!-- Check for registration error -->
+                        <div th:if="${addCarError}" class="alert alert-danger col-xs-offset-1 col-xs-10">
+                            <span th:text="${addCarError}"></span>
+                        </div>
 
-            <div class="panel-heading">
-                <div class="panel-title">Add new Car</div>
+                    </div>
+                </div>
             </div>
-
-            <div style="padding-top: 30px" class="panel-body">
-
-                <!-- Registration Form -->
-                <form th:action="@{/employee/processAddCar}"
-                      th:object="${carData}" method="POST"
-                      class="form-horizontal">
-
-                    <!-- Marque -->
+            <!-- Choose make form -->
+            <th:block th:if="${carData.make == null}">
+                <form th:action="@{/employee/processCarMakeChoose}"
+                      method="POST" class="form-horizontal">
+                    <legend class="form-legend">Add new car</legend>
                     <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" th:field="*{marque}" placeholder="marque (*)" class="form-control" />
+                        <select name="make">
+                            <option th:each="carMake : ${carMakeList}" th:value="${carMake}" th:text="${carMake}"></option>
+                        </select>
                     </div>
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-secondary">Choose car make</button>
+                </form>
+                <br>
+            </th:block>
+            <!-- Add car Form -->
+            <form th:action="@{/employee/processAddCar}"
+                  th:object="${carData}" method="POST"
+                  class="form-horizontal">
 
-                    <div th:if="${#fields.hasErrors('marque')}"
-                         style="margin-bottom: 25px" class="text-danger">
-                        <ul>
-                            <li th:each="err : ${#fields.errors('marque')}" th:text="'Marque ' + ${err}" />
-                        </ul>
-                    </div>
 
+                <!-- car make -->
+                <th:block th:if="${carData.make != null}">
+                    <legend class="form-legend">Add new car<br><p th:object="${carData}" th:text="*{make}"/></legend>
+
+                    <input type="hidden" th:field="*{make}"/>
 
                     <!-- Model -->
                     <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                        <input type="text" th:field="*{model}" placeholder="model (*)" class="form-control" />
-                    </div>
-                    <div th:if="${#fields.hasErrors('model')}"
-                         style="margin-bottom: 25px" class="text-danger">
-                        <ul>
-                            <li th:each="err : ${#fields.errors('model')}" th:text="'Model ' + ${err}" />
-                        </ul>
-                    </div>
-
-                    <!-- Year -->
-                    <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                        <input type="text" th:field="*{year}" placeholder="year (*)" class="form-control" />
-                    </div>
-                    <div th:if="${#fields.hasErrors('year')}"
-                         style="margin-bottom: 25px" class="text-danger">
-                        <ul>
-                            <li th:each="err : ${#fields.errors('year')}" th:text="'Year ' + ${err}" />
-                        </ul>
-                    </div>
-
-
-                    <!-- vin -->
-                    <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" th:field="*{vin}" placeholder="VIN (*)" class="form-control" />
-                    </div>
-                    <div th:if="${#fields.hasErrors('vin')}"
-                         style="margin-bottom: 25px" class="text-danger">
-                        <ul>
-                            <li th:each="err : ${#fields.errors('vin')}" th:text="'VIN ' + ${err}" />
-                        </ul>
-                    </div>
-
-                    <!-- Registration number -->
-                    <div style="margin-bottom: 25px" class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                        <input type="text" th:text th:field="*{registrationNumber}" placeholder="registrationNumber (*)" class="form-control" />
-                    </div>
-                    <div th:if="${#fields.hasErrors('registrationNumber')}"
-                         style="margin-bottom: 25px" class="text-danger">
-                        <ul>
-                            <li th:each="err : ${#fields.errors('registrationNumber')}" th:text="'Registration Number ' + ${err}" />
-                        </ul>
-                    </div>
-
-                    <!-- Engine type -->
-                    <div style="margin-bottom: 25px" class="input-group">
-                        <select th:field="*{engineType}">
-                            <option th:each="i : ${T(com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.EngineType).values()}"
-                                    th:value="${i}" th:text="${i}"></option>
+                        <select th:field="*{model}" class="form-select" aria-label="Default select example">
+                        <option th:each="carModel : ${carModelList}" th:value="${carModel}" th:text="${carModel}"></option>
                         </select>
                     </div>
 
-                    <!-- Add Button -->
-                    <div style="margin-top: 10px" class="form-group">
-                        <div class="col-sm-6 controls">
-                            <button type="submit" class="btn btn-primary">Add Car</button>
-                        </div>
-                    </div>
+                </th:block>
 
-                </form>
+                <!-- Year -->
+                <div style="margin-bottom: 25px" class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                    <input type="text" th:field="*{year}" placeholder="year (*)" class="form-control" />
+                </div>
+                <div th:if="${#fields.hasErrors('year')}"
+                     style="margin-bottom: 25px" class="text-danger">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('year')}" th:text="'Year ' + ${err}" />
+                    </ul>
+                </div>
 
-            </div>
 
+                <!-- vin -->
+                <div style="margin-bottom: 25px" class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    <input type="text" th:field="*{vin}" placeholder="VIN (*)" class="form-control" />
+                </div>
+                <div th:if="${#fields.hasErrors('vin')}"
+                     style="margin-bottom: 25px" class="text-danger">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('vin')}" th:text="'VIN ' + ${err}" />
+                    </ul>
+                </div>
+
+                <!-- Registration number -->
+                <div style="margin-bottom: 25px" class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    <input type="text" th:text th:field="*{registrationNumber}" placeholder="registrationNumber (*)" class="form-control" />
+                </div>
+                <div th:if="${#fields.hasErrors('registrationNumber')}"
+                     style="margin-bottom: 25px" class="text-danger">
+                    <ul>
+                        <li th:each="err : ${#fields.errors('registrationNumber')}" th:text="'Registration Number ' + ${err}" />
+                    </ul>
+                </div>
+
+                <!-- Engine type -->
+                <select th:field="*{engineType}" class="form-select" aria-label="Default select example">
+                    <option th:each="i : ${T(com.mnykolaichuk.luv2code.springboot.thymeleafdemo.model.enums.EngineType).values()}"
+                            th:value="${i}" th:text="${i}"></option>
+                </select>
+
+                <!-- Add Button -->
+                <button type="submit" class="btn btn-secondary">Add Car</button>
+            </form>
         </div>
-
     </div>
-
-</div>
-
-<!--мапінг на dashboard-->
-<div>
-    <a th:href="@{/employee/dashboard}" class="btn btn-primary" role="button" aria-pressed="true">home</a>
-</div>
-
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -15,14 +15,15 @@ import java.time.LocalDate;
 public class OrderAnswerData {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "is required")
     private LocalDate implementationDate;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "is required")
     private Stan stan;
 
     private Integer OrderAnswerId;
 
+    @NotNull(message = "is required")
     private Double price;
 
     private WorkshopData workshopData;
@@ -65,5 +66,16 @@ public class OrderAnswerData {
 
     public void setWorkshopData(WorkshopData workshopData) {
         this.workshopData = workshopData;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderAnswerData{" +
+                "implementationDate=" + implementationDate +
+                ", stan=" + stan +
+                ", OrderAnswerId=" + OrderAnswerId +
+                ", price=" + price +
+                ", workshopData=" + workshopData +
+                '}';
     }
 }
