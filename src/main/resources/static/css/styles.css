@@ -1,0 +1,317 @@
+body {
+    /*background-color: #393f46;*/
+    background-color: #dee2e6eb;
+}
+
+nav {
+    z-index: 1;
+}
+
+.navbar {
+    /*box-shadow: 0px -2px 16px 0px rgb(249, 250, 251);*/
+}
+
+.navbar-nav {
+    position: relative;
+}
+
+.nav-link {
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.center-links {
+    position: absolute;
+    align-items: center;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.divider {
+    color: rgba(255,255,255,.55);
+    font-size: 18px;
+}
+
+.offer-right-side {
+    padding: 2rem;
+}
+
+.offer-title {
+    padding-bottom: 20px;
+}
+
+.card {
+    /*margin: 35px 0 35px 0;*/
+    /*box-shadow: 11px 9px 8px 0px #212529;*/
+}
+
+.login-form {
+    width: 420px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+.form-legend {
+    text-align: center;
+    font-size: 34px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #636464;
+    padding-bottom: 12px;
+}
+
+.login-form-btn {
+    display: block;
+    width: 90px;
+    margin: 0 auto;
+    margin-top: 30px;
+    font-size: 18px;
+}
+
+.add-existing-car {
+    padding: 50px 0;
+    background: linear-gradient(180deg, #dee2e6 0%, rgba(108,117,125,1) 100%);
+}
+
+.hidden {
+    display: none;
+}
+
+.add-existing-car__title {
+    text-align: center;
+}
+
+.mycar-form {
+    background-color: #fff;
+    width: 250px;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 30px 0;
+}
+
+.mycar-form li {
+    border: none;
+    border-bottom: 1px solid #c3c9d0;
+}
+
+.mycar-form ul {
+    padding: 0;
+    margin: 0;
+}
+
+.mycar-form li:first-child {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.car-card ul li:first-child {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.add-existing-car .mycar-form li:last-child {
+    text-align: center;
+    padding: 0;
+    margin-top: 10px;
+    border: none;
+}
+
+.show-existing-car .mycar-form {
+    margin-top: 50px;
+}
+
+
+.mycar-wrapper {
+    display: flex;
+    justify-content: space-around;
+    /*margin-top: 30px;*/
+    flex-wrap: wrap;
+}
+
+.mycar-form li p {
+    margin: 0;
+}
+
+.mycar-form button {
+    display: block;
+    margin: 0 auto;
+}
+
+.add-temporary-car {
+    padding: 50px 0;
+}
+
+.workshop-form {
+    width: 420px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 0 auto;
+}
+
+.workshop-form .form-select {
+    width: 130px;
+    margin-top: 5px;
+    margin-bottom: 25px;
+}
+
+.workshop-form button {
+    display: block;
+    margin: 0 auto;
+}
+
+.add-new-car {
+    padding: 50px 0;
+}
+
+.order-list {
+    padding: 25px 0;
+}
+
+.order-list table td {
+    vertical-align: middle;
+}
+
+.order-list table td:last-child {
+    text-align: end;
+}
+
+.user-page {
+    padding: 50px;
+}
+
+.user-page__content {
+    display: flex;
+}
+
+.user-page .card {
+    width: 430px;
+    margin-right: 20px;
+}
+
+.user-page .card img {
+    width: 108px;
+    margin: 0 auto;
+}
+
+.user-page .card .card-body {
+    text-align: center;
+    padding: 0;
+}
+
+.user-page .card .card-body a {
+    width: 100%;
+    border-radius: 0;
+    margin-top: 22px;
+    height: 48px;
+    font-size: 22px;
+}
+
+.user-page__table {
+    width: 845px;
+    background-color: #fff;
+}
+
+.user-page__table table {
+    margin: 0;
+}
+
+.user-page__table table tr td a {
+    padding: 0;
+}
+
+.user-page__table table tr:nth-child(4) {
+    border-bottom: 2px solid #6c757d;
+}
+
+.user-update {
+    padding: 50px 0;
+}
+
+.user-update .workshop-form button {
+    margin: 0;
+    width: 150px;
+}
+
+.completed-order-list {
+    padding: 25px 0;
+}
+
+.registration {
+    padding-top: 25px;
+    padding-bottom: 18px;
+}
+
+.registration .error-list {
+    padding: 0;
+}
+
+.registration .error-list-item {
+    list-style-type: none;
+    font-size: 14px;
+}
+
+.registration .workshop-form button {
+    margin-top: 30px;
+    width: 140px;
+}
+
+.create-order {
+    min-height: 450px;
+    background: url(../img/order-bg.jpg) center center/cover no-repeat;
+    padding: 100px 0 30px 0;
+}
+
+.create-order__title {
+    text-align: center;
+    font-size: 48px;
+    color: #fff;
+}
+
+.create-order__wrapper {
+
+}
+
+.create_order__desrc {
+    text-align: center;
+    top: 182px;
+    color: #fff;
+    font-size: 22px;
+    margin-top: 30px;
+}
+
+.create-order__btn {
+    display: block;
+    padding: 19px 44px;
+    font-size: 22px;
+    line-height: 26px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-radius: 7px;
+    background-color: #212529;
+    border-color: #212529;
+    width: 250px;
+    margin: 0 auto;
+    margin-top: 94px;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 55px;
+    background-color: #212529;
+    margin-top: 40px;
+    box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.582);
+}
+
+footer p {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    color: #fff;
+}
