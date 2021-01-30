@@ -119,6 +119,11 @@ public class OrderAnswerServiceImpl implements OrderAnswerService {
     public void chooseOrderAnswerForCompleted(OrderAnswer orderAnswer) {
         orderAnswer.setStan(Stan.COMPLETED);
         orderAnswerRepository.save(orderAnswer);
+        for (OrderAnswer tempOrderAnswer : orderAnswer.getOrder().getOrderAnswers()) {
+            if(tempOrderAnswer.getId() != orderAnswer.getId()) {
+                orderAnswerRepository.deleteOrderAnswerById(tempOrderAnswer.getId());
+            }
+        }
         sendStanChangeEmail(orderAnswer);
     }
     private void sendStanChangeEmail(OrderAnswer orderAnswer) {

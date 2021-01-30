@@ -105,6 +105,12 @@
                                     <button type="submit" class="btn btn-secondary">options</button>
                                 </form>
                             </td>
+                            <td th:if="${orderWorkshopDataIterator.orderAnswerData.stan.toString() == 'UNREGISTERED'}">
+                                <form th:action="@{/workshop/processOrderCompleted}" method="POST" class="form-horizontal">
+                                    <input type="hidden" th:value="${orderWorkshopDataIterator.orderAnswerId}" name="orderAnswerId"/>
+                                    <button type="submit" class="btn btn-secondary">completed</button>
+                                </form>
+                            </td>
                             <td>
                                 <form th:action="@{/workshop/deleteOrder}" method="POST" class="form-horizontal">
                                     <input type="hidden" th:value="${orderWorkshopDataIterator.orderAnswerId}" name="orderAnswerId"/>

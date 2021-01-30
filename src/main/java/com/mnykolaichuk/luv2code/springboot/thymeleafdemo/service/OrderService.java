@@ -70,6 +70,7 @@ public interface OrderService {
 
     /**
      * Zwraca listę objektów do wysłania danych o zleceniu dla klienta. Będą zwrócone tylko zlecenia z stanem nie równym 'COMPLETED'.
+     * Żeby wyświetlić stany 'CREATED', 'UNREGISTERED', 'IMPLEMENTATION'
      *
      * @param username Employee username
      * @return List objektów do komunikacji z FrontEnd(Klient-Zlecenie) Stan != 'COMPLETED'

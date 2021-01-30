@@ -351,7 +351,8 @@ public class OrderServiceImpl implements OrderService {
         else {
             //Jeżeli stan zlecenia jest 'IMPLEMENTATION' lub 'CREATED' on ma jeden przypisany objekt OrderAnswer
             if (order.getOrderAnswers().size() == 1
-                    && order.getOrderAnswers().get(0).getStan() != Stan.CREATED && order.getOrderAnswers().get(0).getStan() != Stan.WORKSHOP_ANSWER) {
+                    && order.getOrderAnswers().get(0).getStan() != Stan.CREATED && order.getOrderAnswers().get(0).getStan() != Stan.WORKSHOP_ANSWER
+                    && order.getOrderAnswers().get(0).getStan() != Stan.UNREGISTERED) {
                 switch (order.getOrderAnswers().get(0).getStan()) {
                     case IMPLEMENTATION:
                         //admin może usunąć warsztat, chociaż on ma zlecenie w stanie 'IMPLEMENTATION'
@@ -387,20 +388,14 @@ public class OrderServiceImpl implements OrderService {
             }
             //jeżeli zlecenie ma więcej jednego przypisanego OrderAnser stan równy 'CREATED' lub 'WORKSHOP_ANSWER' lub 'UNREGISTERED'
             //jeżeli wszystkie warsztaty usuną swoje odpowiedzi to nie będzie przypisanych warsztatów i takie zlecenie usuwa się z bazy danych
+
+            //zostały zlecenie o stanie równym 'CREATED', 'UNREGISTERED' lub 'WORKSHOP_ANSWER'. Oni są usuwane z bazy danych
             else {
-                //jezeli zlecenie ma stan 'UNREGISTERED' to wszystkie OrderAnswer mają taki stan
-                if (order.getOrderAnswers().get(0).getStan() == Stan.UNREGISTERED) {
-                    order.setEmployeeDetail(null);
-                    orderRepository.save(order);
+                carService.deleteByOrder(order);
+                for (OrderAnswer orderAnswer : order.getOrderAnswers()) {
+                    orderAnswerService.delete(orderAnswer);
                 }
-                //zostały zlecenie o stanie równym 'CREATED' lub 'WORKSHOP_ANSWER'. Oni są usuwane z bazy danych
-                else {
-                    carService.deleteByOrder(order);
-                    for (OrderAnswer orderAnswer : order.getOrderAnswers()) {
-                        orderAnswerService.delete(orderAnswer);
-                    }
-                    orderRepository.deleteOrderById(order.getId());
-                }
+                orderRepository.deleteOrderById(order.getId());
             }
         }
     }

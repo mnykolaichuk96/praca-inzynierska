@@ -117,7 +117,7 @@
                             <td/>
                             <td/>
 
-                        <td>
+                        <td th:if="${orderEmployeeDataIterator.orderAnswerDataList.get(0).stan.toString() != 'UNREGISTERED'}">
                             <input type="hidden" th:value="${orderEmployeeDataIterator.orderId}" name="orderId"/>
                             <button type="submit" class="btn btn-secondary">Oferty</button>
                         </td>

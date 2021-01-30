@@ -77,7 +77,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(isEmployeeDetailNotNew) {
             employeeDetailService.sendNotNewEmployeeDetailEmailVerificationEmail(employeeDetail);
         }
-        employeeDetailService.sendEmployeeDetailEmailVerificationEmail(employeeDetail);
+        else {
+            employeeDetailService.sendEmployeeDetailEmailVerificationEmail(employeeDetail);
+        }
     }
 
     private void encodePassword(EmployeeData source, Employee target) {

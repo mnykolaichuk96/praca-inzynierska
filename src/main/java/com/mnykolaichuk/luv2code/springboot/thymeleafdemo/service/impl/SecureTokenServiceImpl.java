@@ -63,12 +63,7 @@ public class SecureTokenServiceImpl implements SecureTokenService {
     public void removeToken(SecureToken token) {
         token.setEmployeeDetail(null);
         token.setWorkshop(null);
-        secureTokenRepository.delete(token);
-    }
-
-    @Override
-    public void removeTokenByToken(String token) {
-        secureTokenRepository.removeByToken(token);
+        secureTokenRepository.deleteSecureTokenById(token.getId());
     }
 
     @Override

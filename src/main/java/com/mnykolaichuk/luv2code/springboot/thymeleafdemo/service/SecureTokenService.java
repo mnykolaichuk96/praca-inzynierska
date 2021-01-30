@@ -14,5 +14,4 @@ public interface SecureTokenService {
     public SecureToken findByToken(String token);
     SecureToken findByEmployeeDetail(EmployeeDetail employeeDetail);
     public void removeToken(SecureToken token);
-    public void removeTokenByToken(String token);
 }
