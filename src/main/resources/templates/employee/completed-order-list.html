@@ -70,15 +70,12 @@
                                 <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Registration</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Description</th>
-                                        <th scope="col">Workshop Name</th>
-                                        <th scope="col">City</th>
-                                        <th scope="col">Address</th>
-                                        <th scope="col">Phone number</th>
-                                        <th scope="col">Email</th>
+                                        <th scope="col">Creation</th>
                                         <th scope="col">Implementation date</th>
                                         <th scope="col">Price</th>
+                                        <th scope="col">Workshop Name</th>
+                                        <th scope="col">Phone Number</th>
+                                        <th scope="col"></th>
                                         <th scope="col"></th>
                                         <th/>
                                 </tr>
@@ -88,23 +85,22 @@
                                         <td class="scope">1</td>
                                         <td th:text="${orderEmployeeDataIterator.carData.registrationNumber}"/>
                                         <td th:text="${orderEmployeeDataIterator.creationDate}"/>
-                                        <td th:text="${orderEmployeeDataIterator.description}"/>
+                                        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).implementationDate}"/>
+                                        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).price}"/>
                                         <th:block th:if="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData != null}">
                                                 <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.workshopName}"/>
-                                                <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.cityName}"/>
-                                                <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.address}"/>
                                                 <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.phoneNumber}"/>
-                                                <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData.email}"/>
                                         </th:block>
                                         <th:block th:if="${orderEmployeeDataIterator.orderAnswerDataList.get(0).workshopData == null}">
                                                 <td/>
                                                 <td/>
-                                                <td/>
-                                                <td/>
-                                                <td/>
                                         </th:block>
-                                        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).implementationDate}"/>
-                                        <td th:text="${orderEmployeeDataIterator.orderAnswerDataList.get(0).price}"/>
+                                        <td>
+                                                <form th:action="@{/employee/showCompletedOrderListOptions}" method="POST">
+                                                        <input type="hidden" th:value="${orderEmployeeDataIterator.orderId}" name="orderId"/>
+                                                        <button type="submit" class="btn btn-secondary">Options</button>
+                                                </form>
+                                        </td>
                                         <td>
                                                 <form th:action="@{/employee/deleteOrder}" method="POST">
                                                         <input type="hidden" th:value="${orderEmployeeDataIterator.orderId}" name="orderId"/>

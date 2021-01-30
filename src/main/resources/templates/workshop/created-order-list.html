@@ -75,17 +75,14 @@
                 <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Registration</th>
-                    <th scope="col">Date</th>
+                    <th scope="col">Creation</th>
                     <th scope="col">Car Make</th>
                     <th scope="col">Model</th>
                     <th scope="col">Year</th>
-                    <th scope="col">Engine Type</th>
-                    <th scope="col">Vin Number</th>
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
                     <th scope="col">Phone Number</th>
-                    <th scope="col">Email</th>
+                    <th scope="col"></th>
                     <th scope="col"></th>
 
                 </tr>
@@ -95,17 +92,19 @@
                     <tr>
                         <div>
                             <td class="scope">1</td>
-                            <td th:text="${orderWorkshopDataIterator.carData.registrationNumber}"/>
                             <td th:text="${orderWorkshopDataIterator.creationDate}"/>
                             <td th:text="${orderWorkshopDataIterator.carData.make}"/>
                             <td th:text="${orderWorkshopDataIterator.carData.model}"/>
                             <td th:text="${orderWorkshopDataIterator.carData.year}"/>
-                            <td th:text="${orderWorkshopDataIterator.carData.engineType}"/>
-                            <td th:text="${orderWorkshopDataIterator.carData.vin}"/>
                             <td th:text="${orderWorkshopDataIterator.employeeDetailData.firstName}"/>
                             <td th:text="${orderWorkshopDataIterator.employeeDetailData.lastName}"/>
                             <td th:text="${orderWorkshopDataIterator.employeeDetailData.phoneNumber}"/>
-                            <td th:text="${orderWorkshopDataIterator.employeeDetailData.email}"/>
+                            <td>
+                                <form th:action="@{/workshop/showCreatedOrderListOptions}" method="POST" class="form-horizontal">
+                                    <input type="hidden" th:value="${orderWorkshopDataIterator.orderAnswerId}" name="orderAnswerId"/>
+                                    <button type="submit" class="btn btn-secondary">options</button>
+                                </form>
+                            </td>
                             <td>
                                 <form th:action="@{/workshop/deleteOrder}" method="POST" class="form-horizontal">
                                     <input type="hidden" th:value="${orderWorkshopDataIterator.orderAnswerId}" name="orderAnswerId"/>
@@ -114,11 +113,7 @@
                             </td>
                         </div>
                     </tr>
-                    <tr>
-                        <td>
-                        <td th:text="${orderWorkshopDataIterator.description}"/>
-                        </td>
-                    </tr>
+
                     <tr th:if="${orderWorkshopDataIterator.orderAnswerData.stan.toString() != 'UNREGISTERED'}">
                         <form th:action="@{/workshop/processOrderChoose}" th:object="${orderAnswerData}"
                               method="POST"

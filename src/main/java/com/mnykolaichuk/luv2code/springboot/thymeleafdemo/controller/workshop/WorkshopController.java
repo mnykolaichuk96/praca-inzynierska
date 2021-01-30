@@ -218,6 +218,15 @@ public class WorkshopController {
         return new ModelAndView(new RedirectView("showCreatedOrderList"));
     }
 
+    @PostMapping("/showCreatedOrderListOptions")
+    public ModelAndView showCreatedOrderListOptions(Model model
+            , @RequestParam("orderAnswerId") Integer orderAnswerId) {
+
+        model.addAttribute("orderWorkshopData", orderService.getOrderWorkshopDataByOrderAnswerId(orderAnswerId));
+
+        return new ModelAndView("workshop/created-order-list-options");
+    }
+
     @GetMapping("/showImplementationOrderList")
     public String showImplementationOrderList(Model model
             , @CurrentSecurityContext(expression = "authentication.name") String username) {
@@ -229,6 +238,15 @@ public class WorkshopController {
                 ("orderWorkshopDataList", orderWorkshopDataList);
         model.addAttribute("message", null);
         return "workshop/implementation-order-list";
+    }
+
+    @PostMapping("/showImplementationOrderListOptions")
+    public ModelAndView showImplementationOrderListOptions(Model model
+            , @RequestParam("orderAnswerId") Integer orderAnswerId) {
+
+        model.addAttribute("orderWorkshopData", orderService.getOrderWorkshopDataByOrderAnswerId(orderAnswerId));
+
+        return new ModelAndView("workshop/implementation-order-list-options");
     }
 
     @PostMapping("/processOrderCompleted")
@@ -247,6 +265,15 @@ public class WorkshopController {
         model.addAttribute
                 ("orderWorkshopDataList", orderWorkshopDataList);
         return "workshop/completed-order-list";
+    }
+
+    @PostMapping("/showCompletedOrderListOptions")
+    public ModelAndView showCompletedOrderListOptions(Model model
+            , @RequestParam("orderAnswerId") Integer orderAnswerId) {
+
+        model.addAttribute("orderWorkshopData", orderService.getOrderWorkshopDataByOrderAnswerId(orderAnswerId));
+
+        return new ModelAndView("workshop/completed-order-list-options");
     }
 
     @GetMapping("/showOption")

@@ -234,6 +234,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderEmployeeData getOrderEmployeeDataByOrderId(Integer id) {
+        OrderEmployeeData orderEmployeeData = new OrderEmployeeData();
+        Order order = findOrderById(id);
+        OrderAnswer orderAnswer = order.getOrderAnswers().get(0);
+        orderEmployeeData.setDescription(order.getDescription());
+        orderEmployeeData.setCreationDate(order.getCreationDate());
+        orderEmployeeData.setCityName(order.getCity().getCityName());
+        orderEmployeeData.setOrderId(id);
+        orderEmployeeData.setOrderAnswerDataList(Arrays.asList(orderAnswerService.getOrderAnswerData(orderAnswer)));
+        orderEmployeeData.setCarData(carService.getCarData(order.getCar()));
+
+        return orderEmployeeData;
+    }
+
+    @Override
     public List<OrderWorkshopData> getOrderWorkshopDataListByUsernameAndStanEqualsCreated(String username) {
         return getOrderWorkshopDataListByUsernameAndStan(username, Stan.CREATED);
     }
@@ -289,6 +304,21 @@ public class OrderServiceImpl implements OrderService {
             isUnregistered = false;
         }
         return orderWorkshopDataList;
+    }
+
+    @Override
+    public OrderWorkshopData getOrderWorkshopDataByOrderAnswerId(Integer id) {
+        OrderWorkshopData orderWorkshopData = new OrderWorkshopData();
+        OrderAnswer orderAnswer = orderAnswerService.findById(id);
+        Order order = orderAnswer.getOrder();
+        orderWorkshopData.setDescription(order.getDescription());
+        orderWorkshopData.setCreationDate(order.getCreationDate());
+        orderWorkshopData.setOrderAnswerId(id);
+        orderWorkshopData.setCityName(order.getCity().getCityName());
+        orderWorkshopData.setEmployeeDetailData(employeeDetailService.getEmployeeDetailData(order.getEmployeeDetail()));
+        orderWorkshopData.setCarData(carService.getCarData(order.getCar()));
+        orderWorkshopData.setOrderAnswerData(orderAnswerService.getOrderAnswerData(orderAnswer));
+        return orderWorkshopData;
     }
 
     @Override

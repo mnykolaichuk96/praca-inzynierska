@@ -96,6 +96,8 @@ public interface OrderService {
      */
     List<OrderEmployeeData> getOrderEmployeeDataListByUsernameAndStanEqualsCompleted(String username);
 
+    OrderEmployeeData getOrderEmployeeDataByOrderId(Integer id);
+
     /**
      * Zwraca listę objektów OrderWorkshopData(komunikacja z Front End Warsztat-Zlecenie) na podstawie username warsztatu.
      * Będą zwrócone tylko zlecenia z stanem równym 'CREATED'(stworzone zlecenia).
@@ -122,6 +124,8 @@ public interface OrderService {
      * @return List OrderWorkshopData objekt do komunikacji z FrontEnd(Klient-Zlecenie) Stan = 'COMPLETED'
      */
     List<OrderWorkshopData> getOrderWorkshopDataListByUsernameAndStanEqualsCompleted(String username);
+
+    OrderWorkshopData getOrderWorkshopDataByOrderAnswerId(Integer id);
 
     /**
      * Zwraca Entity Order na podstawie go id.

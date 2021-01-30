@@ -428,6 +428,15 @@ public class EmployeeController {
         return "employee/completed-order-list";
     }
 
+    @PostMapping("/showCompletedOrderListOptions")
+    public ModelAndView showCompletedOrderListOptions(Model model
+            , @RequestParam("orderId") Integer orderId) {
+
+        model.addAttribute("orderEmployeeData", orderService.getOrderEmployeeDataByOrderId(orderId));
+
+        return new ModelAndView("employee/completed-order-list-options");
+    }
+
     @GetMapping("/showOption")
     public String showShowOption(Model model
             , @RequestParam(value = "message",required = false) String message
